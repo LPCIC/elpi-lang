@@ -1,0 +1,177 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Elpi",
+	"patterns": [
+		{
+			"include": "#namespace-declaration"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#clause-declaration"
+		},
+		{
+			"include": "#type-declaration"
+		},
+		{
+			"include": "#pred-declaration"
+		}
+	],
+	"repository": {
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.block.elpi",
+					"begin": "/\\*",
+					"end": "\\*/"
+				},
+				{
+					"name": "comment.line.percentage.elpi",
+					"match": "%.*$"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.elpi",
+					"match": "!|:-|=>|\\[|\\]|,|\\bis\\b"
+				}
+			]
+		},
+		"pred-declaration": {
+			"name": "pred.declaration",
+			"begin": "^((external)?\\s*pred)\\s+([a-z!-']([a-zA-Z!_']|\\.[a-z!-'])*|\\(\\S+\\))",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				},
+				"2": {
+					"name": "keyword.control.elpi"
+				},
+				"3": {
+					"name": "entity.name.function"
+				}
+			},
+			"endCaptures": { "1": { "name": "keyword.control.elpi" } },
+			"patterns": [
+				{
+					"include": "#mode"
+				},
+				{
+					"include": "#type-expr"
+				}
+			]
+		},
+		"type-declaration": {
+			"name": "type.declaration",
+			"begin": "^((external)?\\s*type)\\s+(([a-z!-']([a-zA-Z!_']|\\.[a-z!-'])*)|(\\(\\S+\\))+)",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				},
+				"2": {
+					"name": "keyword.control.elpi"
+				},
+				"3": {
+					"name": "entity.name.function"
+				}
+			},
+			"endCaptures": { "1": { "name": "keyword.control.elpi" } },
+			"patterns": [
+				{
+					"include": "#type-expr"
+				}
+			]
+		},
+
+		"clause-declaration": {
+			"name": "clause.declaration",
+			"begin": "^(((?!pred|type|namespace|mode|accumulate|external|macro|kind)[a-z]\\S*)|[A-Z_][A-Z_'a-z]*\\s*(\\S+))",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "entity.name.function"
+				}
+			},
+			"endCaptures": { "1": { "name": "keyword.control.elpi" } },
+			"patterns": [
+				{
+					"include": "#variables"
+				},
+				{
+					"include": "#strings"
+				},
+				{
+					"include": "#numbers"
+				},
+				{
+					"include": "#keywords"
+				},
+				{
+					"include": "#comments"
+				}
+			]
+		},
+		"type-expr": {
+			"patterns": [
+				{
+					"match": "prop|list|string|int|float",
+					"name": "entity.name.type"
+				},
+				{
+					"include": "#variables"
+				}
+			]
+		},
+		"mode": {
+			"patterns": [
+				{
+					"match": "\\b(i:|o:)",
+					"name": "entity.name.tag"
+				}
+			]
+		},
+		"namespace-declaration": {
+			"patterns": [
+				{
+					"name": "entity.name.section.elpi",
+					"match": "\\bnamespace\\b[^{]*"
+				}
+			]
+		},
+		"variables": {
+			"patterns": [
+				{
+					"match": "\\b[_A-Z][a-zA-Z0-9_']*\\b",
+					"name": "variable.language.elpi"
+				}
+			]
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"name": "constant.numeric.elpi",
+					"match": "\\b[0-9][0-9\\.]*\\b"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.elpi",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.elpi",
+					"match": "\\\\."
+				}
+			]
+		}
+	},
+	"scopeName": "source.elpi",
+	"foldingStartMarker": "{\\s*$",
+	"foldingStopMarker": "^\\s*}"
+}

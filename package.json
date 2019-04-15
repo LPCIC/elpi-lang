@@ -1,0 +1,37 @@
+{
+    "name": "elpi-lang",
+    "displayName": "Elpi lang",
+    "description": "Syntax highlighting for Elpi",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.33.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "elpi",
+                "aliases": [
+                    "Elpi",
+                    "elpi"
+                ],
+                "extensions": [
+                    ".elpi"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "elpi",
+                "scopeName": "source.elpi",
+                "path": "./syntaxes/elpi.tmLanguage.json"
+            }
+        ]
+    },
+    "devDependencies": {
+        "js-yaml": "^3.13.1"
+    }
+}
