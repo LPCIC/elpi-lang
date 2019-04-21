@@ -1,6 +1,7 @@
-# elpi-lang README
+# elpi-lang
 
-This is the README for your extension "elpi-lang". After writing up a brief description, we recommend including the following sections.
+This extension provides some basic support for the [Elpi](https://github.com/LPCIC/elpi)
+programming language to Visual Studio Code.
 
 ## Features
 
@@ -22,4 +23,6 @@ This is the README for your extension "elpi-lang". After writing up a brief desc
 
 ## Release Notes
 
-### Unreleased
+### 0.0.1
+
+First public release
