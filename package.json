@@ -30,8 +30,5 @@
                 "path": "./syntaxes/elpi.tmLanguage.json"
             }
         ]
-    },
-    "devDependencies": {
-        "js-yaml": "^3.13.1"
     }
 }

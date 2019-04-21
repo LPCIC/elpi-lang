@@ -3,22 +3,53 @@
 	"name": "Elpi",
 	"patterns": [
 		{
-			"include": "#namespace-declaration"
-		},
-		{
-			"include": "#comments"
-		},
-		{
-			"include": "#clause-declaration"
-		},
-		{
-			"include": "#type-declaration"
-		},
-		{
-			"include": "#pred-declaration"
+			"include": "#self"
 		}
 	],
 	"repository": {
+		"self": {
+			"patterns": [
+				{
+					"include": "#comments"
+				},
+				{
+					"include": "#namespace-declaration"
+				},
+				{
+					"include": "#clause-declaration"
+				},
+				{
+					"include": "#type-declaration"
+				},
+				{
+					"include": "#kind-declaration"
+				},
+				{
+					"include": "#pred-declaration"
+				},
+				{
+					"include": "#macro-declaration"
+				},
+				{
+					"include": "#attribute-declaration"
+				},
+				{
+					"include": "#mode-declaration"
+				},
+				{
+					"include": "#rule-declaration"
+				},
+				{
+					"include": "#constraint-declaration"
+				},
+				{
+					"include": "#accumulate-declaration"
+				},
+				{
+					"include": "#shorten-declaration"
+				}
+			]
+		},
 		"comments": {
 			"patterns": [
 				{
@@ -36,13 +67,98 @@
 			"patterns": [
 				{
 					"name": "keyword.control.elpi",
-					"match": "!|:-|=>|\\[|\\]|,|\\bis\\b"
+					"match": "!|:-|=>|\\[|\\]|,|\\bis\\b|\\bpi\\b|\\bsigma\\b|<=>|=|\\?\\-|\\\\|\\|"
+				}
+			]
+		},
+		"attribute-declaration": {
+			"name": "attribute.declaration",
+			"patterns": [
+				{
+					"match": ":if\\s+\"\\S+\"",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": ":name\\s+\"\\S+\"",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": ":before\\s+\"\\S+\"",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": ":after\\s+\"\\S+\"",
+					"name": "entity.name.tag"
+				},
+				{
+					"include": "#indexing-declaration"
+				}
+			]
+		},
+		"indexing-declaration": {
+			"begin": "(:index)\\s*\\(",
+			"end": "\\)",
+			"beginCaptures": {
+				"1": {
+					"name": "entity.name.tag"
+				}
+			},
+			"patterns": [
+				{
+					"match": "_|[0-9]",
+					"name": "constant.numeric"
+				}
+			]
+		},
+		"constraint-declaration": {
+			"begin": "^\\s*(constraint)([^{]+)",
+			"end": "{",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				},
+				"2": {
+					"name": "entity.name.function"
+				}
+			}
+		},
+		"rule-declaration": {
+			"begin": "^\\s*(rule)",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"patterns": [{"include": "#terms"}]
+		},
+		"accumulate-declaration": {
+			"begin": "^\\s*(accumulate)",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#strings"
 				}
 			]
 		},
 		"pred-declaration": {
 			"name": "pred.declaration",
-			"begin": "^((external)?\\s*pred)\\s+([a-z!-']([a-zA-Z!_']|\\.[a-z!-'])*|\\(\\S+\\))",
+			"begin": "^((external)?\\s*pred)\\s+([a-z!-']([a-zA-Z!_'\\-0-9><?]|\\.[a-z!-'])*|\\(\\S+\\))",
 			"end": "(\\.)\\s",
 			"beginCaptures": {
 				"1": {
@@ -55,13 +171,69 @@
 					"name": "entity.name.function"
 				}
 			},
-			"endCaptures": { "1": { "name": "keyword.control.elpi" } },
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
 			"patterns": [
 				{
 					"include": "#mode"
 				},
 				{
+					"include": "#comments"
+				},
+				{
 					"include": "#type-expr"
+				}
+			]
+		},
+		"mode-declaration": {
+			"name": "mode.declaration",
+			"begin": "^(\\s*mode)\\s+\\((([a-z!-']([a-zA-Z!_']|\\.[a-z!-'])*)|(\\(\\S+\\))+)\\s",
+			"end": "([io\\s]+)\\)\\s*(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				},
+				"2": {
+					"name": "entity.name.function"
+				}
+			},
+			"endCaptures": {
+				"2": {
+					"name": "keyword.control.elpi"
+				},
+				"1": {
+					"name": "entity.name.tag"
+				}
+			},
+			"patterns": []
+		},
+		"kind-declaration": {
+			"name": "kind.declaration",
+			"begin": "^((external)?\\s*kind)\\s+(([a-z!-']([a-zA-Z!_']|\\.[a-z!-'])*)|(\\(\\S+\\))+)",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				},
+				"2": {
+					"name": "keyword.control.elpi"
+				},
+				"3": {
+					"name": "entity.name.type"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"patterns": [
+				{
+					"match": "type",
+					"name": "entity.name.type"
 				}
 			]
 		},
@@ -80,24 +252,37 @@
 					"name": "entity.name.function"
 				}
 			},
-			"endCaptures": { "1": { "name": "keyword.control.elpi" } },
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
 			"patterns": [
+				{
+					"include": "#comments"
+				},
 				{
 					"include": "#type-expr"
 				}
 			]
 		},
-
-		"clause-declaration": {
-			"name": "clause.declaration",
-			"begin": "^(((?!pred|type|namespace|mode|accumulate|external|macro|kind)[a-z]\\S*)|[A-Z_][A-Z_'a-z]*\\s*(\\S+))",
+		"macro-declaration": {
+			"name": "macro.declaration",
+			"begin": "^\\s*(macro)\\s+(@[a-z]\\S*)\\s",
 			"end": "(\\.)\\s",
 			"beginCaptures": {
 				"1": {
-					"name": "entity.name.function"
+					"name": "keyword.control.elpi"
+				},
+				"2": {
+					"name": "entity.name.type"
 				}
 			},
-			"endCaptures": { "1": { "name": "keyword.control.elpi" } },
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
 			"patterns": [
 				{
 					"include": "#variables"
@@ -116,11 +301,86 @@
 				}
 			]
 		},
+		"clause-declaration": {
+			"name": "clause.declaration",
+			"begin": "^(((?!pred|type|namespace|mode|accumulate|external|macro|kind|shorten|constraint|rule)[a-z]\\S*)|[A-Z_][A-Z_'a-z]*\\s*(\\S+))",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "entity.name.function"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"patterns": [{"include": "#terms"}]
+		},
+		"terms":{
+			"patterns": [
+				{
+					"include": "#variables"
+				},
+				{
+					"include": "#strings"
+				},
+				{
+					"include": "#numbers"
+				},
+				{
+					"include": "#keywords"
+				},
+				{
+					"include": "#comments"
+				}
+			]
+		},
+		"shorten-declaration": {
+			"begin": "^\\s*(shorten)",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#shortening-expr"
+				}
+			]
+		},
+		"shortening-expr": {
+			"begin": "\\b([a-z][a-zA-Z_!0-9\\-\\.]*)\\b\\.{",
+			"end": "}",
+			"beginCaptures": {
+				"1": {
+					"name": "entity.name.section"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#shortening-expr"
+				},
+				{
+					"match": "\\b[a-z][a-zA-Z_!0-9\\-\\.]*\\b",
+					"name": "entity.name.function"
+				}
+			]
+		},
 		"type-expr": {
 			"patterns": [
 				{
-					"match": "prop|list|string|int|float",
+					"match": "prop|list|string|int|float|any|variadic|@[a-z_\\-0-9]+",
 					"name": "entity.name.type"
+				},
+				{
+					"include": "#comments"
 				},
 				{
 					"include": "#variables"
@@ -136,10 +396,22 @@
 			]
 		},
 		"namespace-declaration": {
+			"begin": "^\\s*(namespace)\\s\\b([a-z][a-zA-Z_!0-9\\-\\.]*)\\b\\s*{",
+			"end": "}",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				},
+				"2": {
+					"name": "entity.name.section"
+				}
+			},
 			"patterns": [
 				{
-					"name": "entity.name.section.elpi",
-					"match": "\\bnamespace\\b[^{]*"
+					"include": "#comments"
+				},
+				{
+					"include": "#self"
 				}
 			]
 		},
