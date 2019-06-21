@@ -3,13 +3,16 @@
     "displayName": "Elpi lang",
     "publisher": "gares",
     "description": "Syntax highlighting for Elpi",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "homepage": "https://github.com/LPCIC/elpi-lang",
     "repository": {
         "type": "git",
         "url": "https://github.com/LPCIC/elpi-lang"
     },
-    "keywords": ["elpi","lambda Prolog"],
+    "keywords": [
+        "elpi",
+        "lambda Prolog"
+    ],
     "license": "MIT",
     "engines": {
         "vscode": "^1.33.0"
@@ -28,7 +31,7 @@
                 "extensions": [
                     ".elpi"
                 ],
-                "configuration": "./language-configuration.json"
+                "configuration": "./elpi-configuration.json"
             }
         ],
         "grammars": [

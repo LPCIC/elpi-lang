@@ -25,5 +25,8 @@
         ["(", ")"],
         ["\"", "\""],
         ["'", "'"]
-    ]
+    ],
+	"foldingStartMarker": "{\\s*$",
+    "foldingStopMarker": "^\\s*}",
+    "wordPattern": "[a-z][a-zA-Z0-9_-]*|[A-Z_][a-zA-Z0-9_-]*|[0-9]+"
 }

@@ -63,14 +63,6 @@
 				}
 			]
 		},
-		"keywords": {
-			"patterns": [
-				{
-					"name": "keyword.control.elpi",
-					"match": "!|:-|=>|\\[|\\]|,|\\bis\\b|\\bpi\\b|\\bsigma\\b|<=>|=|\\?\\-|\\\\|\\|"
-				}
-			]
-		},
 		"attribute-declaration": {
 			"name": "attribute.declaration",
 			"patterns": [
@@ -135,7 +127,7 @@
 					"name": "keyword.control.elpi"
 				}
 			},
-			"patterns": [{"include": "#terms"}]
+			"patterns": [{"include": "#term"}]
 		},
 		"accumulate-declaration": {
 			"begin": "^\\s*(accumulate)",
@@ -285,25 +277,13 @@
 			},
 			"patterns": [
 				{
-					"include": "#variables"
-				},
-				{
-					"include": "#strings"
-				},
-				{
-					"include": "#numbers"
-				},
-				{
-					"include": "#keywords"
-				},
-				{
-					"include": "#comments"
+					"include": "#term"
 				}
 			]
 		},
 		"clause-declaration": {
 			"name": "clause.declaration",
-			"begin": "^(((?!pred|type|namespace|mode|accumulate|external|macro|kind|shorten|constraint|rule)[a-z]\\S*)|[A-Z_][A-Z_'a-z]*\\s*(\\S+))",
+			"begin": "^((\\s*(?!pred|type|namespace|mode|accumulate|external|macro|kind|shorten|constraint|rule)[a-z]\\S*)|[A-Z_][A-Z_'a-z]*\\s*(\\S+))",
 			"end": "(\\.)\\s",
 			"beginCaptures": {
 				"1": {
@@ -315,9 +295,9 @@
 					"name": "keyword.control.elpi"
 				}
 			},
-			"patterns": [{"include": "#terms"}]
+			"patterns": [{"include": "#term"}]
 		},
-		"terms":{
+		"term":{
 			"patterns": [
 				{
 					"include": "#variables"
@@ -333,7 +313,14 @@
 				},
 				{
 					"include": "#comments"
+				},
+				{
+					"include": "#ident"
+				},
+				{
+					"include": "#quotation"
 				}
+
 			]
 		},
 		"shorten-declaration": {
@@ -441,9 +428,33 @@
 					"match": "\\\\."
 				}
 			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.elpi",
+					"match": "!|:-|=>|\\[|\\]|,|\\bis\\b|\\bpi\\b|\\bsigma\\b|<=>|=|\\?\\-|\\\\|\\|"
+				}
+			]
+		},
+		"ident": {
+					"begin": "(?=[a-z][a-zA-Z0-9-]*)",
+					"end":"(?=[ ,\\)\\.])",
+					"name": "entity.name.elpi",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.elpi"
+						}
+					},
+					"patterns": [ ]
+		
+		},
+		"quotation": {
+			"name": "source.elpi.quotation",
+			"begin": "{{",
+			"end": "}}",
+			"patterns": [ ]
 		}
 	},
-	"scopeName": "source.elpi",
-	"foldingStartMarker": "{\\s*$",
-	"foldingStopMarker": "^\\s*}"
+	"scopeName": "source.elpi"
 }
