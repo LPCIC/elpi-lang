@@ -428,7 +428,7 @@
 			}
 		},
 		"clause-def-ident": {
-			"match": "^\\s*[a-z][a-zA-Z0-9_'?\\.-]*(?=.*(:-|\\.\\s*$))",
+			"match": "^ *[a-z][a-zA-Z0-9_'?\\.-]*(?=.*:-)",
 			"name": "entity.name.function"
 		}
 	},
