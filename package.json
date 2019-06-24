@@ -1,45 +1,50 @@
 {
-    "name": "elpi-lang",
-    "displayName": "Elpi lang",
-    "publisher": "gares",
-    "description": "Syntax highlighting for Elpi",
-    "version": "0.0.2",
-    "homepage": "https://github.com/LPCIC/elpi-lang",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/LPCIC/elpi-lang"
-    },
-    "keywords": [
-        "elpi",
-        "lambda Prolog"
-    ],
-    "license": "MIT",
-    "engines": {
-        "vscode": "^1.33.0"
-    },
-    "categories": [
-        "Programming Languages"
-    ],
-    "contributes": {
-        "languages": [
-            {
-                "id": "elpi",
-                "aliases": [
-                    "Elpi",
-                    "elpi"
-                ],
-                "extensions": [
-                    ".elpi"
-                ],
-                "configuration": "./elpi-configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "elpi",
-                "scopeName": "source.elpi",
-                "path": "./syntaxes/elpi.tmLanguage.json"
-            }
-        ]
-    }
+	"name": "elpi-lang",
+	"displayName": "Elpi lang",
+	"publisher": "gares",
+	"description": "Syntax highlighting for Elpi",
+	"version": "0.0.2",
+	"homepage": "https://github.com/LPCIC/elpi-lang",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/LPCIC/elpi-lang"
+	},
+	"keywords": [
+		"elpi",
+		"lambda Prolog"
+	],
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.33.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "elpi",
+				"aliases": [
+					"Elpi",
+					"elpi"
+				],
+				"extensions": [
+					".elpi"
+				],
+				"configuration": "./elpi-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "elpi",
+				"scopeName": "source.elpi",
+				"path": "./syntaxes/elpi.tmLanguage.json"
+			}
+		]
+	},
+	"__metadata": {
+		"id": "040542ac-8f59-4e38-95f9-463f42c78f77",
+		"publisherDisplayName": "Enrico Tassi",
+		"publisherId": "a31c90d1-39d0-4553-b020-dd47cff7daf8"
+	}
 }

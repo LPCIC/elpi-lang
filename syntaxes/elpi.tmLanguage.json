@@ -3,53 +3,64 @@
 	"name": "Elpi",
 	"patterns": [
 		{
-			"include": "#self"
+			"include": "#comments"
+		},
+		{
+			"include": "#namespace-declaration"
+		},
+		{
+			"include": "#clause-declaration"
+		},
+		{
+			"include": "#type-declaration"
+		},
+		{
+			"include": "#kind-declaration"
+		},
+		{
+			"include": "#pred-declaration"
+		},
+		{
+			"include": "#macro-declaration"
+		},
+		{
+			"include": "#attribute-declaration"
+		},
+		{
+			"include": "#mode-declaration"
+		},
+		{
+			"include": "#rule-declaration"
+		},
+		{
+			"include": "#constraint-declaration"
+		},
+		{
+			"include": "#accumulate-declaration"
+		},
+		{
+			"include": "#shorten-declaration"
+		},
+		{
+			"include": "#variables"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#clause-def-ident"
 		}
 	],
 	"repository": {
-		"self": {
-			"patterns": [
-				{
-					"include": "#comments"
-				},
-				{
-					"include": "#namespace-declaration"
-				},
-				{
-					"include": "#clause-declaration"
-				},
-				{
-					"include": "#type-declaration"
-				},
-				{
-					"include": "#kind-declaration"
-				},
-				{
-					"include": "#pred-declaration"
-				},
-				{
-					"include": "#macro-declaration"
-				},
-				{
-					"include": "#attribute-declaration"
-				},
-				{
-					"include": "#mode-declaration"
-				},
-				{
-					"include": "#rule-declaration"
-				},
-				{
-					"include": "#constraint-declaration"
-				},
-				{
-					"include": "#accumulate-declaration"
-				},
-				{
-					"include": "#shorten-declaration"
-				}
-			]
-		},
 		"comments": {
 			"patterns": [
 				{
@@ -127,7 +138,11 @@
 					"name": "keyword.control.elpi"
 				}
 			},
-			"patterns": [{"include": "#term"}]
+			"patterns": [
+				{
+					"include": "$self"
+				}
+			]
 		},
 		"accumulate-declaration": {
 			"begin": "^\\s*(accumulate)",
@@ -277,50 +292,8 @@
 			},
 			"patterns": [
 				{
-					"include": "#term"
+					"include": "$self"
 				}
-			]
-		},
-		"clause-declaration": {
-			"name": "clause.declaration",
-			"begin": "^((\\s*(?!pred|type|namespace|mode|accumulate|external|macro|kind|shorten|constraint|rule)[a-z]\\S*)|[A-Z_][A-Z_'a-z]*\\s*(\\S+))",
-			"end": "(\\.)\\s",
-			"beginCaptures": {
-				"1": {
-					"name": "entity.name.function"
-				}
-			},
-			"endCaptures": {
-				"1": {
-					"name": "keyword.control.elpi"
-				}
-			},
-			"patterns": [{"include": "#term"}]
-		},
-		"term":{
-			"patterns": [
-				{
-					"include": "#variables"
-				},
-				{
-					"include": "#strings"
-				},
-				{
-					"include": "#numbers"
-				},
-				{
-					"include": "#keywords"
-				},
-				{
-					"include": "#comments"
-				},
-				{
-					"include": "#ident"
-				},
-				{
-					"include": "#quotation"
-				}
-
 			]
 		},
 		"shorten-declaration": {
@@ -398,23 +371,15 @@
 					"include": "#comments"
 				},
 				{
-					"include": "#self"
+					"include": "$self"
 				}
 			]
 		},
 		"variables": {
 			"patterns": [
 				{
-					"match": "\\b[_A-Z][a-zA-Z0-9_']*\\b",
+					"match": "\\b[_A-Z][a-zA-Z0-9_'?]*\\b",
 					"name": "variable.language.elpi"
-				}
-			]
-		},
-		"numbers": {
-			"patterns": [
-				{
-					"name": "constant.numeric.elpi",
-					"match": "\\b[0-9][0-9\\.]*\\b"
 				}
 			]
 		},
@@ -429,6 +394,14 @@
 				}
 			]
 		},
+		"numbers": {
+			"patterns": [
+				{
+					"name": "constant.numeric.elpi",
+					"match": "\\b[0-9][0-9\\.]*\\b"
+				}
+			]
+		},
 		"keywords": {
 			"patterns": [
 				{
@@ -437,18 +410,9 @@
 				}
 			]
 		},
-		"ident": {
-					"begin": "(?=[a-z][a-zA-Z0-9-]*)",
-					"end":"(?=[ ,\\)\\.])",
-					"name": "entity.name.elpi",
-					"patterns": [ ]
-		
-		},
-		"quotation": {
-			"name": "quotation.elpi",
-			"begin": "(?={{)",
-			"end": "(?<=}})",
-			"patterns": []
+		"clause-def-ident": {
+			"match": "^[a-z][a-zA-Z0-9_'?\\.-]*",
+			"name": "entity.name.function"
 		}
 	},
 	"scopeName": "source.elpi"
