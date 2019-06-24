@@ -54,6 +54,9 @@
 			"include": "#keywords"
 		},
 		{
+			"include": "#binders"
+		},
+		{
 			"include": "#comments"
 		},
 		{
@@ -380,6 +383,10 @@
 				{
 					"match": "\\b[_A-Z][a-zA-Z0-9_'?]*\\b",
 					"name": "variable.language.elpi"
+				},
+				{
+					"match": "\\b[a-z][a-zA-Z0-9_'?]*\\s*(?=\\\\)",
+					"name": "variable.language.elpi"
 				}
 			]
 		},
@@ -395,23 +402,33 @@
 			]
 		},
 		"numbers": {
-			"patterns": [
-				{
-					"name": "constant.numeric.elpi",
-					"match": "\\b[0-9][0-9\\.]*\\b"
-				}
-			]
+			"name": "constant.numeric.elpi",
+			"match": "\\b[0-9][0-9\\.]*\\b"
 		},
 		"keywords": {
-			"patterns": [
-				{
-					"name": "keyword.control.elpi",
-					"match": "!|:-|=>|\\[|\\]|,|\\bis\\b|\\bpi\\b|\\bsigma\\b|<=>|=|\\?\\-|\\\\|\\|"
+			"name": "keyword.control.elpi",
+			"match": "!|:-|=>|\\[|\\]|,|\\bis\\b|<=>|=|\\?\\-|\\\\|\\|"
+		},
+		"binders": {
+			"name": "binder.elpi",
+			"begin": "\\b(pi|sigma)\\b([^\\\\]*)",
+			"end": "(\\\\)",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				},
+				"2": {
+					"name": "variable.language.elpi"
 				}
-			]
+			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			}
 		},
 		"clause-def-ident": {
-			"match": "^\\s*[a-z][a-zA-Z0-9_'?\\.-]*(?=.*:-)",
+			"match": "^\\s*[a-z][a-zA-Z0-9_'?\\.-]*(?=.*(:-|\\.\\s*$))",
 			"name": "entity.name.function"
 		}
 	},
