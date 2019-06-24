@@ -441,19 +441,14 @@
 					"begin": "(?=[a-z][a-zA-Z0-9-]*)",
 					"end":"(?=[ ,\\)\\.])",
 					"name": "entity.name.elpi",
-					"beginCaptures": {
-						"1": {
-							"name": "entity.name.elpi"
-						}
-					},
 					"patterns": [ ]
 		
 		},
 		"quotation": {
-			"name": "source.elpi.quotation",
-			"begin": "{{",
-			"end": "}}",
-			"patterns": [ ]
+			"name": "quotation.elpi",
+			"begin": "(?={{)",
+			"end": "(?<=}})",
+			"patterns": []
 		}
 	},
 	"scopeName": "source.elpi"
