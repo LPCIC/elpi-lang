@@ -168,8 +168,8 @@
 		},
 		"pred-declaration": {
 			"name": "pred.declaration",
-			"begin": "^((external)?\\s*pred)\\s+([a-z!-']([a-zA-Z!_'\\-0-9><?]|\\.[a-z!-'])*|\\(\\S+\\))",
-			"end": "(\\.)\\s",
+			"begin": "^(\\s*(external)?\\s*pred)\\s+([a-z!-']([a-zA-Z!_'\\-0-9><?]|\\.[a-z!-'])*|\\(\\S+\\))",
+			"end": "(?<=\\.\\s)",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.control.elpi"
@@ -181,26 +181,31 @@
 					"name": "entity.name.function"
 				}
 			},
-			"endCaptures": {
-				"1": {
-					"name": "keyword.control.elpi"
-				}
-			},
 			"patterns": [
 				{
-					"include": "#mode"
-				},
-				{
-					"include": "#comments"
-				},
-				{
-					"include": "#type-expr"
+					"begin": "\\b(i:|o:)",
+					"end": "(,|\\.\\s)",
+					"beginCaptures": {
+						"1" : {
+							"name" : "entity.name.tag"
+						}						
+					},
+					"endCaptures": {
+						"1" : {
+							"name" : "keyword.control.elpi"
+						}						
+					},
+					"patterns": [
+						{ "include": "#comments" },
+						{ "match":"[^\\.,]+", "name":"entity.name.type" }
+
+					]
 				}
 			]
 		},
 		"mode-declaration": {
 			"name": "mode.declaration",
-			"begin": "^(\\s*mode)\\s+\\((([a-z!-']([a-zA-Z!_']|\\.[a-z!-'])*)|(\\(\\S+\\))+)\\s",
+			"begin": "^(\\s*mode)\\s+\\((([a-z!-']([a-zA-Z!_'\\-0-9><?]|\\.[a-z!-'])*)|(\\(\\S+\\))+)\\s",
 			"end": "([io\\s]+)\\)\\s*(\\.)\\s",
 			"beginCaptures": {
 				"1": {
@@ -222,7 +227,7 @@
 		},
 		"kind-declaration": {
 			"name": "kind.declaration",
-			"begin": "^((external)?\\s*kind)\\s+(([a-z!-']([a-zA-Z!_']|\\.[a-z!-'])*)|(\\(\\S+\\))+)",
+			"begin": "^(\\s*(external)?\\s*kind)\\s+(?'rec'([a-z!-']([a-zA-Z!_'\\-0-9><?]|\\.[a-z!-'])*|\\(\\S+\\))(,\\s(\\g'rec'))?)\\s+([^\\.]+)",
 			"end": "(\\.)\\s",
 			"beginCaptures": {
 				"1": {
@@ -233,33 +238,9 @@
 				},
 				"3": {
 					"name": "entity.name.type"
-				}
-			},
-			"endCaptures": {
-				"1": {
-					"name": "keyword.control.elpi"
-				}
-			},
-			"patterns": [
-				{
-					"match": "type",
+				},
+				"8": {
 					"name": "entity.name.type"
-				}
-			]
-		},
-		"type-declaration": {
-			"name": "type.declaration",
-			"begin": "^((external)?\\s*type)\\s+(([a-z!-']([a-zA-Z!_']|\\.[a-z!-'])*)|(\\(\\S+\\))+)",
-			"end": "(\\.)\\s",
-			"beginCaptures": {
-				"1": {
-					"name": "keyword.control.elpi"
-				},
-				"2": {
-					"name": "keyword.control.elpi"
-				},
-				"3": {
-					"name": "entity.name.function"
 				}
 			},
 			"endCaptures": {
@@ -270,9 +251,35 @@
 			"patterns": [
 				{
 					"include": "#comments"
+				}
+			]
+		},
+		"type-declaration": {
+			"name": "type.declaration",
+			"begin": "^(\\s*(external)?\\s*type)\\s+(?'rec'([a-z!-']([a-zA-Z!_'\\-0-9><?]|\\.[a-z!-'])*|\\(\\S+\\))(,\\s(\\g'rec'))?)\\s+([^\\.]+)",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
 				},
+				"2": {
+					"name": "keyword.control.elpi"
+				},
+				"3": {
+					"name": "entity.name.function"
+				},
+				"8": {
+					"name": "entity.name.type"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"patterns": [
 				{
-					"include": "#type-expr"
+					"include": "#comments"
 				}
 			]
 		},
@@ -333,28 +340,6 @@
 				{
 					"match": "\\b[a-z][a-zA-Z_!0-9\\-\\.]*\\b",
 					"name": "entity.name.function"
-				}
-			]
-		},
-		"type-expr": {
-			"patterns": [
-				{
-					"match": "prop|list|string|int|float|any|variadic|@[a-z_\\-0-9]+",
-					"name": "entity.name.type"
-				},
-				{
-					"include": "#comments"
-				},
-				{
-					"include": "#variables"
-				}
-			]
-		},
-		"mode": {
-			"patterns": [
-				{
-					"match": "\\b(i:|o:)",
-					"name": "entity.name.tag"
 				}
 			]
 		},

@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.4
+
+- minor fixes
+
 ## 0.0.3
 
 - major reorganization making is simpler to inject into
