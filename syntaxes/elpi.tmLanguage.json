@@ -396,7 +396,7 @@
 		},
 		"binders": {
 			"name": "binder.elpi",
-			"begin": "\\b(pi|sigma)\\b([^\\\\]*)",
+			"begin": "(?<=[^\\.-_])(pi|sigma)([a-zA-Z0-9_ ]*)",
 			"end": "(\\\\)",
 			"beginCaptures": {
 				"1": {
