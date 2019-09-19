@@ -200,7 +200,8 @@
 						{ "match":"[^\\.,]+", "name":"entity.name.type" }
 
 					]
-				}
+				},
+				{ "include": "#comments" }
 			]
 		},
 		"mode-declaration": {
@@ -413,7 +414,7 @@
 			}
 		},
 		"clause-def-ident": {
-			"match": "^ *[a-z][a-zA-Z0-9_'?\\.-]*(?=.*:-)",
+			"match": "^ *[a-z][a-zA-Z0-9_><'?\\.-]*(?=.*:-)",
 			"name": "entity.name.function"
 		}
 	},
