@@ -186,22 +186,28 @@
 					"begin": "\\b(i:|o:)",
 					"end": "(,|\\.\\s)",
 					"beginCaptures": {
-						"1" : {
-							"name" : "entity.name.tag"
-						}						
+						"1": {
+							"name": "entity.name.tag"
+						}
 					},
 					"endCaptures": {
-						"1" : {
-							"name" : "keyword.control.elpi"
-						}						
+						"1": {
+							"name": "keyword.control.elpi"
+						}
 					},
 					"patterns": [
-						{ "include": "#comments" },
-						{ "match":"[^\\.,]+", "name":"entity.name.type" }
-
+						{
+							"include": "#comments"
+						},
+						{
+							"match": "[^\\.,]+",
+							"name": "entity.name.type"
+						}
 					]
 				},
-				{ "include": "#comments" }
+				{
+					"include": "#comments"
+				}
 			]
 		},
 		"mode-declaration": {
@@ -257,8 +263,8 @@
 		},
 		"type-declaration": {
 			"name": "type.declaration",
-			"begin": "^(\\s*(external)?\\s*type)\\s+(?'rec'([a-z!-']([a-zA-Z!_'\\-0-9><?]|\\.[a-z!-'])*|\\(\\S+\\))(,\\s(\\g'rec'))?)\\s+([^\\.]+)",
-			"end": "(\\.)\\s",
+			"begin": "^(\\s*(external)?\\s*type)\\s+(?'rec'([a-z!-']([a-zA-Z!_'\\-0-9><?]|\\.[a-z!-'])*|\\(\\S+\\))(,\\s(\\g'rec'))?)",
+			"end": "(?<=\\.\\s)",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.control.elpi"
@@ -268,9 +274,6 @@
 				},
 				"3": {
 					"name": "entity.name.function"
-				},
-				"8": {
-					"name": "entity.name.type"
 				}
 			},
 			"endCaptures": {
@@ -279,6 +282,10 @@
 				}
 			},
 			"patterns": [
+				{
+					"match": "[^\\.,%/]+",
+					"name": "entity.name.type"
+				},
 				{
 					"include": "#comments"
 				}
