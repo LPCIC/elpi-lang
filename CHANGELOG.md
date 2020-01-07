@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.7
+
+- add typeabbrev
+
 ## 0.0.6
 
 - minor fixes

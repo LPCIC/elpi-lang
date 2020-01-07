@@ -15,6 +15,9 @@
 			"include": "#type-declaration"
 		},
 		{
+			"include": "#typeabbrev-declaration"
+		},
+		{
 			"include": "#kind-declaration"
 		},
 		{
@@ -274,6 +277,30 @@
 				},
 				"3": {
 					"name": "entity.name.function"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"patterns": [
+				{
+					"match": "[^\\.,%/]+",
+					"name": "entity.name.type"
+				},
+				{
+					"include": "#comments"
+				}
+			]
+		},
+		"typeabbrev-declaration": {
+			"name": "typeabbrev.declaration",
+			"begin": "^(\\s*typeabbrev)",
+			"end": "(?<=\\.\\s)",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
 				}
 			},
 			"endCaptures": {
