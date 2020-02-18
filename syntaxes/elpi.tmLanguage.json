@@ -286,7 +286,7 @@
 			},
 			"patterns": [
 				{
-					"match": "[^\\.,%/]+",
+					"match": "[^\\.,%/ ]+",
 					"name": "entity.name.type"
 				},
 				{

@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.0.8
+
+- fix `type ... % comment`
+
 ## 0.0.7
 
 - add typeabbrev
