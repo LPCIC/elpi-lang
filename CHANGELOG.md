@@ -1,5 +1,10 @@
 # Change Log
 
+### 0.1.0
+
+- use mustache to factor common regexp
+- regexp now 100% match the ones in Elpi's parser
+
 ### 0.0.8
 
 - fix `type ... % comment`

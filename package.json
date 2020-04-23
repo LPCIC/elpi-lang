@@ -46,5 +46,12 @@
 		"id": "040542ac-8f59-4e38-95f9-463f42c78f77",
 		"publisherDisplayName": "Enrico Tassi",
 		"publisherId": "a31c90d1-39d0-4553-b020-dd47cff7daf8"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"mustache": "^4.0.1"
+	},
+	"scripts": {
+		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json"
 	}
 }
