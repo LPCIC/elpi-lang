@@ -3,6 +3,7 @@
 ### 0.1.1
 
 - fix syntax for type declarations
+- minor fix for pi/sigma
 
 ### 0.1.0
 
