@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.1.1
+
+- fix syntax for type declarations
+
 ### 0.1.0
 
 - use mustache to factor common regexp

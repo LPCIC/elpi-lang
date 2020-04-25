@@ -79,7 +79,7 @@ module.exports = {
     "wbl" : function() { return neg_lookbehind(or_set(idchar,it("[.]")))(); },
 
     "6" : "very loose definition of a type expressiong",
-    "typechars" : function() { return plus(or(it("[^,\\\\.]"),nsid))(); },
+    "typechars" : function() { return plus(or(it("[^,\\\\.%]"),nsid))(); },
 
     "99" : "eof"
 }
