@@ -15,12 +15,92 @@
 	],
 	"license": "MIT",
 	"engines": {
-		"vscode": "^1.33.0"
+		"vscode": "^1.50.0"
 	},
+	"extensionKind": [
+		"ui",
+		"workspace"
+	],
 	"categories": [
 		"Programming Languages"
 	],
+	"activationEvents": [
+		"onView:elpi.tracer",
+		"onCommand:elpi.trace",
+		"onCommand:elpi.clear",
+		"onCommand:elpi.watch_start",
+		"onCommand:elpi.watch_stop"
+	],
+	"main": "./out/extension.js",
 	"contributes": {
+		"viewsContainers": {
+			"panel": [
+				{
+					"id": "elpi-tracer",
+					"title": "Elpi Tracer",
+					"icon": "media/panel.svg"
+				}
+			]
+		},
+		"views": {
+			"elpi-tracer": [
+				{
+					"type": "webview",
+					"id": "elpi.tracer",
+					"name": "Elpi Tracer"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "elpi.trace",
+				"category": "Elpi Tracer",
+				"title": "Trace",
+				"icon": "$(debug-console)"
+			},
+			{
+				"command": "elpi.watch_start",
+				"category": "Elpi Tracer",
+				"title": "Start watching",
+				"icon": "$(debug-alt)"
+			},
+			{
+				"command": "elpi.watch_stop",
+				"category": "Elpi Tracer",
+				"title": "Stop watching",
+				"icon": "$(stop)"
+			},
+			{
+				"command": "elpi.clear",
+				"category": "Elpi Tracer",
+				"title": "Clear",
+				"icon": "$(debug-console-clear-all)"
+			}
+		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "elpi.trace",
+					"group": "navigation@0",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.watch_start",
+					"group": "navigation@1",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.watch_stop",
+					"group": "navigation@2",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.clear",
+					"group": "navigation@3",
+					"when": "view == elpi.tracer"
+				}
+			]
+		},
 		"languages": [
 			{
 				"id": "elpi",
@@ -47,11 +127,25 @@
 		"publisherDisplayName": "Enrico Tassi",
 		"publisherId": "a31c90d1-39d0-4553-b020-dd47cff7daf8"
 	},
-	"dependencies": {},
+	"scripts": {
+		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json",
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"lint": "eslint . --ext .ts,.tsx",
+		"watch": "tsc -w -p ./"
+	},
 	"devDependencies": {
+		"@types/node": "^17.0.35",
+		"@types/vscode": "^1.50.0",
+		"@typescript-eslint/eslint-plugin": "^5.19.0",
+		"@typescript-eslint/parser": "^5.19.0",
+		"child-process": "^1.0.2",
+		"eslint": "^8.13.0",
+		"typescript": "^4.6.3",
 		"mustache": "^4.0.1"
 	},
-	"scripts": {
-		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json"
+	"dependencies": {
+		"chokidar": "^3.5.3",
+		"shiki": "^0.10.1"
 	}
 }

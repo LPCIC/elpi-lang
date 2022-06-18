@@ -1,0 +1,657 @@
+html, body
+{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  height: 100%;
+  background-color: transparent;
+}
+
+.aside
+{
+  display:block;
+  background-color: #F9F9F9;
+  border-right: 1px solid #DEDEDE;
+}
+
+.messages
+{
+  display:block;
+  background-color: var(--vscode-sideBar-background);
+  border-right: 1px solid var(--vscode-panel-border);
+  padding: 40px 20px;
+}
+
+.message
+{
+  display:block;
+  background-color: var(--vscode-sideBar-background);
+  padding: 10px 20px;
+}
+
+/* .messages .action-buttons */
+/* { */
+/*   padding: 0; */
+/*   margin-top: -20px; */
+/* } */
+
+/* .message .action-buttons */
+/* { */
+/*   padding: 0; */
+/*   margin-top: -20px; */
+/* } */
+
+.action-buttons
+{
+  padding: 0;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.action-buttons .control.is-grouped
+{
+  display: inline-block;
+  margin-right: 30px;
+}
+
+.action-buttons .control.is-grouped:last-child
+{
+  margin-right: 5px;
+}
+
+.action-buttons .control.is-grouped .button:first-child,
+.action-buttons .control.is-grouped  .input:first-child
+{
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+
+  /* border-radius: 5px 0 0 5px; */
+}
+
+.action-buttons .control.is-grouped .button:last-child,
+.action-buttons .control.is-grouped  .input:last-child
+{
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+
+  /* border-radius: 0 5px 5px 0; */
+}
+
+.action-buttons .control.is-grouped .button,
+.action-buttons .control.is-grouped .input
+{
+  margin-right: -5px;
+  border-radius: 0;
+}
+
+.inbox-messages
+{
+  margin-top:30px;
+}
+
+.message-preview
+{
+  margin-top: 60px;
+  border: 1px solid var(--vscode-panel-border); /* Decrease opacity later on */
+}
+
+.inbox-messages .card
+{
+  width: 100%;
+  margin-bottom: 10px;
+  border: 1px solid var(--vscode-panel-border); /* Decrease opacity later on */
+}
+
+.inbox-messages .card-indented,
+.inbox-messages .card-indented-last
+{
+  width: 95%;
+  margin-left: 5%;
+  margin-bottom: 10px;
+  border: 1px solid var(--vscode-panel-border);
+}
+
+.inbox-messages .card-indented-last
+{
+  margin-bottom: 20px;
+}
+
+.inbox-messages .card-indented::before,
+.inbox-messages .card-indented-last::before
+{
+  font-family: 'Material Design Icons';
+  content: '\F17A9';
+  -webkit-font-feature-settings: 'liga';
+  float: left;
+  position: relative;
+  left: -20px;
+  color: var(--vscode-foreground);
+}
+
+.inbox-messages .card-indented-last::after
+{
+  font-family: 'Material Design Icons';
+  content: '\F17A1';
+  -webkit-font-feature-settings: 'liga';
+  float: right;
+  position: relative;
+  right: 0px;
+  bottom: 0px;
+  color: var(--vscode-foreground);
+}
+
+.inbox-messages strong
+{
+  color: var(--vscode-foreground);
+}
+
+.inbox-messages .msg-check
+{
+  padding: 0 20px;
+}
+
+.inbox-messages .msg-header
+{
+
+}
+
+.inbox-messages .msg-subject
+{
+  /* padding: 5px 0; */
+  color: var(--vscode-foreground);
+}
+
+.inbox-messages .msg-attachment
+{
+  float:right;
+}
+
+/* .inbox-messages .msg-footer */
+/* { */
+/*   float:right; */
+/* } */
+
+.inbox-messages .msg-snippet
+{
+  /* padding: 5px 0; */
+  color: var(--vscode-foreground);
+}
+
+.inbox-messages .msg-footer
+{
+  /* padding: 5px 0px 0px 0px; */
+  color: var(--vscode-foreground);
+  /* border-top: 1px solid var(--vscode-activityBar-background); */
+}
+
+.inbox-messages .msg-subject .fa
+{
+  font-size: 14px;
+  padding:3px 0;
+}
+
+.inbox-messages .msg-timestamp
+{
+  float: right;
+  padding: 0 20px;
+  color: var(--vscode-foreground);;
+}
+
+.message-preview .avatar
+{
+  display: inline-block;
+}
+
+.message-preview .top .address
+{
+  display: inline-block;
+  padding: 0 20px;
+}
+
+.avatar img
+{
+  width: 40px;
+  border-radius: 50px;
+  border: 2px solid #999;
+  padding: 2px;
+}
+
+.goal .desc
+{
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* ***************************************************************************
+;; Me own, me precious
+;; ****************************************************************************/
+
+.dot-red
+{
+  height: 16px;
+  width: 16px;
+  background-color: var(--vscode-charts-red);
+  border-radius: 50%;
+  border: 2px solid #999999;
+  display: inline-block;
+  float: right;
+}
+
+.dot-green
+{
+  height: 16px;
+  width: 16px;
+  background-color: var(--vscode-charts-green);
+  border-radius: 50%;
+  border: 2px solid #999999;
+  display: inline-block;
+  float: right;
+}
+
+.dot-yellow
+{
+  height: 16px;
+  width: 16px;
+  background-color: var(--vscode-charts-yellow);
+  border-radius: 50%;
+  border: 2px solid #999999;
+  display: inline-block;
+  float: right;
+}
+
+.dot-grey
+{
+  height: 16px;
+  width: 16px;
+  background-color: #cccccc;
+  border-radius: 50%;
+  border: 2px solid #999999;
+  display: inline-block;
+  float: right;
+}
+
+.dot-yellowgreen
+{
+  height: 16px;
+  width: 16px;
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-green));
+  border-radius: 50%;
+  border: 2px solid #999999;
+  display: inline-block;
+  float: right;
+}
+
+.dot-yellowred
+{
+  height: 16px;
+  width: 16px;
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-red));
+  border-radius: 50%;
+  border: 2px solid #999999;
+  display: inline-block;
+  float: right;
+}
+
+.tag-spaced
+{
+  margin-right: 5px;
+}
+
+.panel-element
+{
+  padding: 0.5em 0.75em;
+  border-top: 1px solid var(--vscode-panel-border);
+  border-bottom: 1px solid var(--vscode-panel-border);
+  color: var(--vscode-foreground);
+}
+
+.panel-element.panel-element-footer {
+  display: block;
+  height: 8px;
+  padding-bottom: 0px;
+}
+
+.panel-block
+{
+  color: var(--vscode-foreground);
+}
+
+.panel-tabs:not(:last-child), .panel-block:not(:last-child) {
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+/* ***************************************************************************
+;; Overrides
+;; ****************************************************************************/
+
+.columns
+{
+  border-top: 1px solid var(--vscode-panel-border);
+  margin-top: 0px;
+}
+
+.box
+{
+  color: var(--vscode-foreground);
+  /* background-color: var(--vscode-activityBar-background); */
+  background-color: var(--vscode-textCodeBlock-background);
+}
+
+.card,
+.card-indented,
+.card-indented-last
+{
+  /* background-color: var(--vscode-activityBar-background); */
+  background-color: var(--vscode-textCodeBlock-background);
+}
+
+.card.hidden,
+.card-indented.hidden,
+.card-indented-last.hidden
+{
+  display: none;
+  visibility: hidden;
+}
+
+.card.active,
+.card-indented.active,
+.card-indented-last.active
+{
+  /* border: 1px solid var(--vscode-activityBar-background); */
+  border: 1px solid var(--vscode-textCodeBlock-background);
+  background-color: var(--vscode-editor-background);
+}
+
+.card,
+.card-indented
+{
+  margin-bottom: 5px;
+}
+
+hr
+{
+  background-color: var(--vscode-panel-border);
+}
+
+.panel
+{
+  border: 1px solid var(--vscode-panel-border);
+  background-color: var(--vscode-editor-background);
+}
+
+.panel-heading
+{
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-charts-blue);
+}
+
+.panel.is-danger .panel-heading
+{
+  background-color: var(--vscode-charts-red);
+}
+
+.panel.is-success .panel-heading
+{
+  background-color: var(--vscode-charts-green);
+}
+
+.tag:not(body)
+{
+  color: var(--vscode-badge-foreground);
+  background-color: var(--vscode-badge-background);
+}
+
+.tag.tag-red
+{
+  color: #ffffff;
+  background-color: var(--vscode-charts-red);
+}
+
+.tag.tag-green
+{
+  color: #ffffff;
+  background-color: var(--vscode-charts-green);
+}
+
+.tag.tag-yellow
+{
+  color: #000000;
+  background-color: var(--vscode-charts-blue);
+}
+
+.tag.tag-yellowgreen
+{
+  color: #000000;
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-green));
+}
+
+.tag.tag-yellowred
+{
+  color: #000000;
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-red));
+}
+
+.tag.tag-grey
+{
+  color: #000000;
+  background-color: #cccccc;
+}
+
+
+.button,
+.button:hover
+{
+  color: var(--vscode-foreground);
+  /* background-color: var(--vscode-textCodeBlock-background); */
+  background-color: var(--vscode-sideBar-background);
+  border: 1px solid var(--vscode-panel-border);
+  cursor: default;
+}
+
+.button .mdi
+{
+  color: var(--vscode-foreground);
+}
+
+.button.inactive .mdi
+{
+  color: var(--vscode-tab-inactiveForeground);
+}
+
+.input:not([type='checkbox'])
+{
+  border: 1px solid var(--vscode-panel-border);
+  background-color: var(--vscode-editor-background);
+}
+
+.navbar.is-fixed-bottom
+{
+  border-top: 1px solid var(--vscode-panel-border);
+  background-color: var(--vscode-sideBar-background);
+}
+
+.navbar.is-fixed-top {
+    border-top: 1px solid var(--vscode-panel-border);
+    border-bottom: 1px solid var(--vscode-panel-border);
+    background-color: var(--vscode-sideBar-background);
+}
+
+.navbar.is-fixed-bottom ul,
+.navbar.is-fixed-bottom p
+{
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.navbar.is-fixed-bottom p
+{
+  color: var(--vscode-foreground);
+}
+
+.navbar.is-fixed-bottom ul li a .mdi.mdi-card-bulleted,
+.navbar.is-fixed-bottom ul li a
+{
+  color: var(--vscode-disabledForeground);
+}
+
+.navbar.is-fixed-bottom ul li.active a .mdi.mdi-card-bulleted,
+.navbar.is-fixed-bottom ul li.active a
+{
+  color: var(--vscode-foreground);
+}
+
+span.mdi.mdi-card-bulleted
+{
+  margin-right: 10px;
+}
+
+.box:not(:last-child), .content:not(:last-child), .notification:not(:last-child), .progress:not(:last-child), .table:not(:last-child), .table-container:not(:last-child), .title:not(:last-child), .subtitle:not(:last-child), .block:not(:last-child), .breadcrumb:not(:last-child), .level:not(:last-child), .message:not(:last-child), .pagination:not(:last-child), .tabs:not(:last-child)
+{
+  margin-bottom: 0px;
+}
+
+.divider
+{
+  /* color: var(--vscode-badge-background); */
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.divider::after,
+.divider::before
+{
+  background-color: var(--vscode-panel-border);
+}
+
+/* ***************************************************************************
+;; Filtering Dropdown
+;; ****************************************************************************/
+
+.dropdown-menu
+{
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 4px 4px 4px 4px;
+  margin-top: 10px;
+}
+
+.dropdown-content
+{
+  background-color: var(--vscode-editor-background);
+}
+
+.dropdown-item
+{
+  color: var(--vscode-editor-foreground);
+}
+
+dropdown-content:hover
+{
+  color: var(--vscode-editor-foreground);
+  background-color: var(--vscode-editor-lineHighlightBackground);
+}
+
+a.dropdown-item:hover
+{
+  color: var(--vscode-editor-foreground);
+  background-color: var(--vscode-editor-lineHighlightBackground);
+}
+
+.dropdown-divider
+{
+  background-color: var(--vscode-panel-border);
+}
+
+#filter-text
+{
+  padding-left: 5px;
+}
+
+#message-feed {
+  overflow-y: auto;
+  height: 100px;
+}
+
+#trace-information {
+  display: flex;
+  align-items: center;
+  color: var(--vscode-foreground);
+}
+
+/* ***************************************************************************
+;; Card footer is status color
+;; ****************************************************************************/
+
+.card-footer {
+  border-top: 1px solid var(--vscode-panel-border);
+  height: 0.5em;
+}
+
+.card-footer-red
+{
+  background-color: var(--vscode-charts-red);
+}
+
+.card-footer-green
+{
+  background-color: var(--vscode-charts-green);
+}
+
+.card-footer-yellow
+{
+  background-color: var(--vscode-charts-yellow);
+}
+
+.card-footer-grey
+{
+  background-color: #cccccc;
+}
+
+.card-footer-yellowgreen
+{
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-green));
+}
+
+.card-footer-yellowred
+{
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-red));
+}
+
+/* ***************************************************************************
+;; Syntax highlighting
+;;
+;; NOTE: These should be vscode's mtk classes equivalent, but these are not
+;; documented!
+;;
+;; ****************************************************************************/
+
+:root {
+  --shiki-color-text: var(--vscode-symbolIcon-textForeground);
+  --shiki-color-background: var(--vscode-sideBar-background);
+  --shiki-token-constant: var(--vscode-charts-blue);
+  --shiki-token-string: var(--vscode-charts-green);
+  --shiki-token-comment: var(--vscode-charts-lines);
+  --shiki-token-keyword: var(--vscode-charts-purple);
+  --shiki-token-parameter: var(--vscode-charts-purple);
+  --shiki-token-function: var(--vscode-charts-blue);
+  --shiki-token-string-expression: var(--vscode-charts-green);
+  --shiki-token-punctuation: var(--vscode-charts-orange) ;
+  --shiki-token-link: var(--vscode-charts-blue);
+}
+
+#message-feed pre {
+
+  border-radius: 0.5em;
+
+  margin-bottom: 1em;
+}
+
+#message-pane pre {
+
+  font-size: 1.4em;
+
+  border-radius: 0.5em;
+
+  margin-top: -0.5em;
+  margin-bottom: 0.5em;
+}
