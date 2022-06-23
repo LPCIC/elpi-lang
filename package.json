@@ -33,24 +33,6 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"viewsContainers": {
-			"panel": [
-				{
-					"id": "elpi-tracer",
-					"title": "Elpi Tracer",
-					"icon": "media/panel.svg"
-				}
-			]
-		},
-		"views": {
-			"elpi-tracer": [
-				{
-					"type": "webview",
-					"id": "elpi.tracer",
-					"name": "Elpi Tracer"
-				}
-			]
-		},
 		"commands": [
 			{
 				"command": "elpi.trace",
@@ -62,6 +44,7 @@
 				"command": "elpi.watch_start",
 				"category": "Elpi Tracer",
 				"title": "Start watching",
+				
 				"icon": "$(debug-alt)"
 			},
 			{
@@ -75,6 +58,51 @@
 				"category": "Elpi Tracer",
 				"title": "Clear",
 				"icon": "$(debug-console-clear-all)"
+			}
+		],
+		"configuration": {
+			"title": "Elpi",
+			"properties": {
+				"elpi.opam.path": {
+					"type": "string",
+    				"default": "~/.opam",
+					"markdownDescription": "Path to `opam` installation directory"
+				},
+				"elpi.dune.path": {
+					"type": "string",
+    				"default": "~/.opam/bin/path",
+					"markdownDescription": "Path to `dune` binary"
+				},
+				"elpi.elpi.path": {
+					"type": "string",
+    				"default": "~/.opam/bin/elpi",
+					"markdownDescription": "Path to `elpi` binray"
+				},
+				"elpi.elpi-trace-elaborator.path": {
+					"type": "string",
+    				"default": "~/.opam/bin/elpi-trace-elaborator",
+					"markdownDescription": "Path to `elpi-trace-elaborator` binary"
+				}
+			}
+		},
+		"grammars": [
+			{
+				"language": "elpi",
+				"scopeName": "source.elpi",
+				"path": "./syntaxes/elpi.tmLanguage.json"
+			}
+		],
+		"languages": [
+			{
+				"id": "elpi",
+				"aliases": [
+					"Elpi",
+					"elpi"
+				],
+				"extensions": [
+					".elpi"
+				],
+				"configuration": "./elpi-configuration.json"
 			}
 		],
 		"menus": {
@@ -101,26 +129,24 @@
 				}
 			]
 		},
-		"languages": [
-			{
-				"id": "elpi",
-				"aliases": [
-					"Elpi",
-					"elpi"
-				],
-				"extensions": [
-					".elpi"
-				],
-				"configuration": "./elpi-configuration.json"
-			}
-		],
-		"grammars": [
-			{
-				"language": "elpi",
-				"scopeName": "source.elpi",
-				"path": "./syntaxes/elpi.tmLanguage.json"
-			}
-		]
+		"views": {
+			"elpi-tracer": [
+				{
+					"type": "webview",
+					"id": "elpi.tracer",
+					"name": "Elpi Tracer"
+				}
+			]
+		},
+		"viewsContainers": {
+			"panel": [
+				{
+					"id": "elpi-tracer",
+					"title": "Elpi Tracer",
+					"icon": "media/panel.svg"
+				}
+			]
+		}
 	},
 	"__metadata": {
 		"id": "040542ac-8f59-4e38-95f9-463f42c78f77",

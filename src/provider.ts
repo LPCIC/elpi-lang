@@ -39,6 +39,12 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             this._highlighter = highlighter;
             this._highlighter.loadLanguage(elpi_lang);
         });
+
+        let configuration = vscode.workspace.getConfiguration('elpi');
+        let configuration_literal = JSON.stringify(configuration);
+    
+        // this._channel.appendLine(`Retrieved configuration ${configuration_literal}`);
+        // this._channel.appendLine(`Retrieved configuration ${configuration.opam.path}`);
     }
 
     public resolveWebviewView(
