@@ -183,9 +183,14 @@ export class TraceProvider implements vscode.WebviewViewProvider {
        
         vscode.window.showOpenDialog(options).then(fileUri => {
             if (fileUri && fileUri[0]) {
+
+                let configuration = vscode.workspace.getConfiguration('elpi');
+        
+                this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
+
                 this._channel.appendLine("Opening raw trace: " + fileUri[0].fsPath);
 
-                this.exec("eval $(opam env) && sleep 1 && cat " + fileUri[0].fsPath + " | elpi-trace-elaborator > /tmp/trace.json");
+                this.exec("eval $(opam env) && sleep 1 && cat " + fileUri[0].fsPath + " | " + this._elpi_trace_elaborator + " > /tmp/trace.json");
 
                 const trace = parser.readTrace(JSON.parse(fs.readFileSync('/tmp/trace.json', 'utf8')));
 
@@ -232,8 +237,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         this._watcher.on('change', path => {
 
             let configuration = vscode.workspace.getConfiguration('elpi');
-            let current_file = '';
-        
+                    
             this._elpi                  = configuration.elpi.path;
             this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
