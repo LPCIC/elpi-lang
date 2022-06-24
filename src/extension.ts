@@ -9,6 +9,16 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.registerWebviewViewProvider(provider.TraceProvider.viewType, tracer));
 
 	context.subscriptions.push(
+		vscode.commands.registerCommand('elpi.open', () => {
+			tracer.open();
+		}));
+	
+	context.subscriptions.push(
+		vscode.commands.registerCommand('elpi.save', () => {
+			tracer.save();
+		}));
+
+	context.subscriptions.push(
 		vscode.commands.registerCommand('elpi.trace', () => {
 			tracer.trace();
 		}));

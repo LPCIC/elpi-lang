@@ -35,6 +35,18 @@
 	"contributes": {
 		"commands": [
 			{
+				"command": "elpi.open",
+				"category": "Elpi Tracer",
+				"title": "Open",
+				"icon": "$(file-add)"
+			},
+			{
+				"command": "elpi.save",
+				"category": "Elpi Tracer",
+				"title": "Save",
+				"icon": "$(save)"
+			},
+			{
 				"command": "elpi.trace",
 				"category": "Elpi Tracer",
 				"title": "Trace",
@@ -63,25 +75,20 @@
 		"configuration": {
 			"title": "Elpi",
 			"properties": {
-				"elpi.opam.path": {
+				"elpi.elpi.options": {
 					"type": "string",
-    				"default": "~/.opam",
-					"markdownDescription": "Path to `opam` installation directory"
-				},
-				"elpi.dune.path": {
-					"type": "string",
-    				"default": "~/.opam/bin/path",
-					"markdownDescription": "Path to `dune` binary"
+    				"default": "-no-tc -trace-on json /tmp/foo.json -trace-at run 0 999 -trace-only user",
+					"markdownDescription": "Path to `elpi` binray"
 				},
 				"elpi.elpi.path": {
 					"type": "string",
-    				"default": "~/.opam/bin/elpi",
-					"markdownDescription": "Path to `elpi` binray"
+    				"default": "elpi",
+					"markdownDescription": "Path to `elpi` binary (or elpi from `$PATH`)"
 				},
-				"elpi.elpi-trace-elaborator.path": {
+				"elpi.elpi_trace_elaborator.path": {
 					"type": "string",
-    				"default": "~/.opam/bin/elpi-trace-elaborator",
-					"markdownDescription": "Path to `elpi-trace-elaborator` binary"
+    				"default": "elpi-trace-elaborator",
+					"markdownDescription": "Path to `elpi-trace-elaborator` (or elpi from `$PATH`)"
 				}
 			}
 		},
@@ -108,23 +115,33 @@
 		"menus": {
 			"view/title": [
 				{
-					"command": "elpi.trace",
+					"command": "elpi.open",
 					"group": "navigation@0",
 					"when": "view == elpi.tracer"
 				},
 				{
-					"command": "elpi.watch_start",
+					"command": "elpi.save",
 					"group": "navigation@1",
 					"when": "view == elpi.tracer"
 				},
 				{
-					"command": "elpi.watch_stop",
+					"command": "elpi.trace",
 					"group": "navigation@2",
 					"when": "view == elpi.tracer"
 				},
 				{
-					"command": "elpi.clear",
+					"command": "elpi.watch_start",
 					"group": "navigation@3",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.watch_stop",
+					"group": "navigation@4",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.clear",
+					"group": "navigation@5",
 					"when": "view == elpi.tracer"
 				}
 			]

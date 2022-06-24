@@ -11,19 +11,22 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
     public static readonly viewType = 'elpi.tracer';
 
-    private _view?: vscode.WebviewView;
+    private _elpi: string;
+    private _elpi_trace_elaborator: string;
     private _highlighter: shiki.Highlighter | undefined;
+    private _options: string;
+    private _options_default: string;
+    private _view?: vscode.WebviewView;
+    private _source: string;
     private _watcher: chokidar.FSWatcher | undefined;
     private _watcher_target: string;
     private _watcher_target_elaborated: string;
-    private _options: string;
 
     private _channel: any = vscode.window.createOutputChannel('Elpi');
 
     constructor(
         private readonly _extensionUri: vscode.Uri,
     ) {
-
         const elpi_lang_grammer = JSON.parse(fs.readFileSync(vscode.Uri.joinPath(this._extensionUri, 'syntaxes', 'elpi.tmLanguage.json').path, 'utf8'));
         const elpi_lang = {
             id: "elpi",
@@ -31,20 +34,21 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             grammar: elpi_lang_grammer
         };
 
+        this._elpi = "";
+        this._elpi_trace_elaborator = "";
+
         this._options = "-test";
+        this._options_default = "";
+
+        this._source = "";
+
         this._watcher_target = "/tmp/traced.tmp.json";
         this._watcher_target_elaborated = "/tmp/traced.json";
 
         shiki.getHighlighter({theme: 'css-variables'}).then(highlighter => {
             this._highlighter = highlighter;
             this._highlighter.loadLanguage(elpi_lang);
-        });
-
-        let configuration = vscode.workspace.getConfiguration('elpi');
-        let configuration_literal = JSON.stringify(configuration);
-    
-        // this._channel.appendLine(`Retrieved configuration ${configuration_literal}`);
-        // this._channel.appendLine(`Retrieved configuration ${configuration.opam.path}`);
+        });    
     }
 
     public resolveWebviewView(
@@ -169,6 +173,50 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             this._view.webview.postMessage({ type: 'clear' });
     }
 
+    public open() {
+        const options: vscode.OpenDialogOptions = {
+            canSelectMany: false,
+            openLabel: 'Open trace',
+            canSelectFiles: true,
+            canSelectFolders: false
+        };
+       
+        vscode.window.showOpenDialog(options).then(fileUri => {
+            if (fileUri && fileUri[0]) {
+                this._channel.appendLine("Opening raw trace: " + fileUri[0].fsPath);
+
+                this.exec("eval $(opam env) && sleep 1 && cat " + fileUri[0].fsPath + " | elpi-trace-elaborator > /tmp/trace.json");
+
+                const trace = parser.readTrace(JSON.parse(fs.readFileSync('/tmp/trace.json', 'utf8')));
+
+                this._source = fileUri[0].fsPath;
+
+                if (this._view)
+                    this._view.webview.postMessage({ type: 'trace', trace: trace, file: fileUri[0].fsPath });
+            }
+        });
+    }
+
+    public save() {
+        const options: vscode.SaveDialogOptions = {
+            saveLabel: 'Save raw trace as'
+        };
+       
+        vscode.window.showSaveDialog(options).then(fileUri => {
+            if (fileUri) {
+                this._channel.appendLine("Saving trace as: " + fileUri.toString() + " from " + this._source);
+
+                fs.copyFile(this._source, fileUri.toString().slice(7), (err) => { // slice(7) chops 'file://'
+                    if (err) {
+                        this._channel.appendLine("Error saving raw trace to " + fileUri.toString().slice(7) + " " + err.toString());
+                    } else {
+                        this._channel.appendLine("Raw trace saved to " + fileUri.toString().slice(7)); 
+                    }
+                });
+            }
+        });
+    }
+
     public watch_start() {
 
         let message;
@@ -183,15 +231,22 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         this._watcher.on('change', path => {
 
+            let configuration = vscode.workspace.getConfiguration('elpi');
+            let current_file = '';
+        
+            this._elpi                  = configuration.elpi.path;
+            this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
+
             message = `File ${path} has been changed`;
 
             vscode.window.showInformationMessage(message);
             this._channel.appendLine(message);
 
-         // this.exec("eval $(opam env) && sleep 1 && cd " + vscode.workspace.workspaceFolders[0].uri.path + " && cat " + this._watcher_target + " | elpi-trace-elaborator | ydump > " + this._watcher_target_elaborated);
-            this.exec("eval $(opam env) && sleep 1 && cat " + this._watcher_target + " | elpi-trace-elaborator | ydump > " + this._watcher_target_elaborated);
+            this.exec("eval $(opam env) && sleep 1 && cat " + this._watcher_target + " | " + this._elpi_trace_elaborator + " > " + this._watcher_target_elaborated);
 
             const trace = parser.readTrace(JSON.parse(fs.readFileSync(this._watcher_target_elaborated, 'utf8')));
+
+            this._source = this._watcher_target;
 
             if (this._view)
                 this._view.webview.postMessage({ type: 'trace', trace: trace, file: 'Watched' });
@@ -224,7 +279,13 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
     public trace() {
 
+        let configuration = vscode.workspace.getConfiguration('elpi');
         let current_file = '';
+        
+        this._elpi                  = configuration.elpi.path;
+        this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
+
+        this._options_default = configuration.elpi.options;
 
         if(vscode.window.activeTextEditor !== undefined) {
             current_file = vscode.window.activeTextEditor.document.fileName;
@@ -239,8 +300,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         // --
 
         if(vscode.workspace.workspaceFolders !== undefined) {
-            this.exec("eval $(opam env) && cd " + vscode.workspace.workspaceFolders[0].uri.path + " && dune exec elpi -- " + this._options + " -no-tc -trace-on json /tmp/foo.json -trace-at run 0 999 -trace-only user " + current_file);
-            this.exec("eval $(opam env) && cd " + vscode.workspace.workspaceFolders[0].uri.path + " && cat /tmp/foo.json | dune exec elpi-trace-elaborator | ydump > /tmp/trace.json");
+            this.exec("eval $(opam env) && cd " + vscode.workspace.workspaceFolders[0].uri.path + " " + this._elpi + " -- " + this._options + " " + this._options_default + " " + current_file);
+            this.exec("eval $(opam env) && cd " + vscode.workspace.workspaceFolders[0].uri.path + " && cat /tmp/foo.json | " + this._elpi_trace_elaborator + " > /tmp/trace.json");
         }
 
         // --
@@ -252,6 +313,10 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         } else {
             this._channel.appendLine("Trace generation successful.");
         }
+
+        // --
+
+        this._source = "/tmp/foo.json";
 
         // --
 
