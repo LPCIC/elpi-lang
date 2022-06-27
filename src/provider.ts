@@ -304,7 +304,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         // --
 
         if(vscode.workspace.workspaceFolders !== undefined) {
-            this.exec("eval $(opam env) && cd " + vscode.workspace.workspaceFolders[0].uri.path + " " + this._elpi + " -- " + this._options + " " + this._options_default + " " + current_file);
+            this.exec("eval $(opam env) && cd " + vscode.workspace.workspaceFolders[0].uri.path + " && " + this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
             this.exec("eval $(opam env) && cd " + vscode.workspace.workspaceFolders[0].uri.path + " && cat /tmp/foo.json | " + this._elpi_trace_elaborator + " > /tmp/trace.json");
         }
 
@@ -433,7 +433,7 @@ return `<!DOCTYPE html>
 
             <nav class="navbar is-fixed-bottom breadcrumb has-arrow-separator" aria-label="breadcrumbs" style="display: flex;">
 
-                <p>Navigtion history:</p>
+                <p>Navigation history:</p>
 
                 <ul>
                     <li v-for="(step, index) in stack" v-bind:id="'bd-goal-'+index" :class="step.active" v-on:click="switchTo(index)">
