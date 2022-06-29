@@ -122,7 +122,6 @@ html, body
 {
   font-family: 'Material Design Icons';
   content: '\F17A9';
-  -webkit-font-feature-settings: 'liga';
   float: left;
   position: relative;
   left: -20px;
@@ -133,7 +132,6 @@ html, body
 {
   font-family: 'Material Design Icons';
   content: '\F17A1';
-  -webkit-font-feature-settings: 'liga';
   float: right;
   position: relative;
   right: 0px;
@@ -149,11 +147,6 @@ html, body
 .inbox-messages .msg-check
 {
   padding: 0 20px;
-}
-
-.inbox-messages .msg-header
-{
-
 }
 
 .inbox-messages .msg-subject
@@ -501,6 +494,11 @@ hr
   color: var(--vscode-foreground);
 }
 
+#nav_clear {
+  color: var(--vscode-foreground);
+  margin-top: 8px;
+}
+
 span.mdi.mdi-card-bulleted
 {
   margin-right: 10px;
@@ -654,4 +652,37 @@ a.dropdown-item:hover
 
   margin-top: -0.5em;
   margin-bottom: 0.5em;
+}
+
+/* ****************************************************************************
+ * Quick View for code
+ * **************************************************************************** */
+
+.quickview {
+  color: var(--vscode-editor-foreground);
+  background-color: var(--vscode-editor-background);
+}
+
+.quickview-header {
+  background-color: var(--vscode-sideBar-background);
+  border-bottom-color: var(--vscode-panel-border);
+}
+
+.quickview-header .title {
+  color: var(--vscode-editor-foreground);
+}
+
+.quickview-header .delete::before,
+.quickview-header .delete::after
+{
+  background-color: var(--vscode-editor-foreground);
+}
+
+.quickview-block {
+  --shiki-color-background: var(--vscode-editor-background);
+}
+
+.quickview-footer {
+  background-color: var(--vscode-sideBar-background);
+  border-top: 1px solid var(--vscode-panel-border);
 }

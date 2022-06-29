@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as parser from './trace';
 
+import    os = require('node:os');
 import    cp = require('child_process');
 import    fs = require('fs');
 import shiki = require('shiki');
@@ -11,6 +12,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
     public static readonly viewType = 'elpi.tracer';
 
+    private _cat: string;
     private _elpi: string;
     private _elpi_trace_elaborator: string;
     private _highlighter: shiki.Highlighter | undefined;
@@ -18,6 +20,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
     private _options_default: string;
     private _view?: vscode.WebviewView;
     private _source: string;
+    private _target: string;
     private _watcher: chokidar.FSWatcher | undefined;
     private _watcher_target: string;
     private _watcher_target_elaborated: string;
@@ -41,6 +44,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         this._options_default = "";
 
         this._source = "";
+        this._target = "/tmp/trace.json";
 
         this._watcher_target = "/tmp/traced.tmp.json";
         this._watcher_target_elaborated = "/tmp/traced.json";
@@ -48,7 +52,14 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         shiki.getHighlighter({theme: 'css-variables'}).then(highlighter => {
             this._highlighter = highlighter;
             this._highlighter.loadLanguage(elpi_lang);
-        });    
+        });
+
+        this._channel.appendLine("Running extension for " + os.platform() + " - " + os.release());
+
+        if (os.platform().toString().toLowerCase() == "windows")
+            this._cat = "type";
+        else
+            this._cat = "cat";
     }
 
     public resolveWebviewView(
@@ -87,8 +98,24 @@ export class TraceProvider implements vscode.WebviewViewProvider {
                         indx: indx
                     });
 
-                // this._channel.appendLine(`Highlighting ${code}: ${html} for ${indx}`);
-
+                break;
+            }
+            case 'highlight_elided':
+            {
+                const code = message.value;
+                const indx = message.index;
+                let html = undefined;
+                
+                if (this._highlighter)
+                    html = this._highlighter.codeToHtml(code, { lang: 'elpi' });
+                
+                if (this._view)
+                    this._view.webview.postMessage({
+                        type: 'highlight_elided',
+                        html: html,
+                        indx: indx
+                    });
+    
                 break;
             }
             case 'notify':
@@ -190,9 +217,9 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
                 this._channel.appendLine("Opening raw trace: " + fileUri[0].fsPath);
 
-                this.exec("eval $(opam env) && sleep 1 && cat " + fileUri[0].fsPath + " | " + this._elpi_trace_elaborator + " > /tmp/trace.json");
+                this.exec("eval $(opam env) && sleep 1 && cat " + fileUri[0].fsPath + " | " + this._elpi_trace_elaborator + " > " + this._target);
 
-                const trace = parser.readTrace(JSON.parse(fs.readFileSync('/tmp/trace.json', 'utf8')));
+                const trace = parser.readTrace(JSON.parse(fs.readFileSync(this._target, 'utf8')));
 
                 this._source = fileUri[0].fsPath;
 
@@ -246,7 +273,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             vscode.window.showInformationMessage(message);
             this._channel.appendLine(message);
 
-            this.exec("eval $(opam env) && sleep 1 && cat " + this._watcher_target + " | " + this._elpi_trace_elaborator + " > " + this._watcher_target_elaborated);
+            this.exec("eval $(opam env) && cat " + this._watcher_target + " | " + this._elpi_trace_elaborator + " > " + this._watcher_target_elaborated);
 
             const trace = parser.readTrace(JSON.parse(fs.readFileSync(this._watcher_target_elaborated, 'utf8')));
 
@@ -273,6 +300,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
                 const message = "Me watch has ended.";
 
                 vscode.window.showInformationMessage(message);
+                
                 this._channel.appendLine(message);
 
                 if (this._view)
@@ -291,26 +319,33 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         this._options_default = configuration.elpi.options;
 
-        if(vscode.window.activeTextEditor !== undefined) {
-            current_file = vscode.window.activeTextEditor.document.fileName;
-            vscode.window.showInformationMessage(`Tracing: ${current_file}`);
-        }
-
-        if(current_file == '')
+        if(vscode.window.activeTextEditor == undefined)
             return;
 
+        current_file = vscode.window.activeTextEditor.document.fileName;
+        vscode.window.showInformationMessage(`Tracing: ${current_file}`);
+        
         this._channel.appendLine("Trace started: " + current_file);
 
         // --
 
-        if(vscode.workspace.workspaceFolders !== undefined) {
-            this.exec("eval $(opam env) && cd " + vscode.workspace.workspaceFolders[0].uri.path + " && " + this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
-            this.exec("eval $(opam env) && cd " + vscode.workspace.workspaceFolders[0].uri.path + " && cat /tmp/foo.json | " + this._elpi_trace_elaborator + " > /tmp/trace.json");
-        }
+        // this.exec("eval $(opam env) && " + this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
+        this.exec(this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
+            
+        // cp.execSync(this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
+        
+        this.exec("cat /tmp/foo.json | " + this._elpi_trace_elaborator + " > " + this._target);
+        
+        // const cat = cp.spawn(this._cat, ["/tmp/foo.json"]);
+        // const elb = cp.spawn(this._elpi_trace_elaborator);
+        // const out = fs.createWriteStream(this._target);
+        
+        // cat.stdout.pipe(elb.stdin);
+        // elb.stdout.pipe(out);
 
         // --
 
-        if(!fs.existsSync("/tmp/trace.json")) {
+        if(!fs.existsSync(this._target)) {
             vscode.window.showInformationMessage(`Trace generation failed`);
             this._channel.appendLine("Trace generation failed.");
             return;
@@ -324,7 +359,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         // --
 
-        const trace = parser.readTrace(JSON.parse(fs.readFileSync('/tmp/trace.json', 'utf8')))
+        const trace = parser.readTrace(JSON.parse(fs.readFileSync(this._target, 'utf8')))
 
         // --- Send message to the view backend
 
@@ -337,6 +372,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         const      jqueryUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'jquery-3.6.0.js'));
         const         vueUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vue.js'));
         const        fuzzUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'fuzzball.umd.min.js'));
+        const     bulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-quickview.js'));
         const      scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
 
         const    styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
@@ -344,6 +380,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         const    styleBulmaUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma.css'));
         const  styleBulmaDVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-divider.css'));
         const  styleBulmaTTUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-tooltip.css'));
+        const  styleBulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-quickview.min.css'));
         const      styleMDIUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'materialdesignicons.css'));
         const     styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css'));
 
@@ -359,6 +396,7 @@ return `<!DOCTYPE html>
         <link href="${styleBulmaUri}" rel="stylesheet">
         <link href="${styleBulmaDVUri}" rel="stylesheet">
         <link href="${styleBulmaTTUri}" rel="stylesheet">
+        <link href="${styleBulmaQVUri}" rel="stylesheet">
         <link href="${styleMDIUri}" rel="stylesheet">
         <link href="${styleMainUri}" rel="stylesheet">
 
@@ -429,6 +467,14 @@ return `<!DOCTYPE html>
                         </a>
                     </div>
                 </div>
+
+                <div class="action-buttons" style="display: flex; margin-right: 10px;">
+                    <div class="control is-grouped" style="display: flex;">
+                        <a id="lambda" class="button has-tooltip-arrow has-tooltip-bottom" data-tooltip="Code Snippet" data-show="quickview" data-target="quickviewDefault" style="flex: 1 1 auto;">
+                            <span class="mdi mdi-lambda"></span>
+                        </a>
+                    </div>
+                </div>
             </nav>
 
             <nav class="navbar is-fixed-bottom breadcrumb has-arrow-separator" aria-label="breadcrumbs" style="display: flex;">
@@ -440,6 +486,8 @@ return `<!DOCTYPE html>
                         <a><span class="mdi mdi-card-bulleted"></span>({{ step.rt }}, {{ step.id }})</a>
                     </li>
                 </ul>
+
+                <span id="nav_clear" class="mdi mdi-close-circle-outline is-hidden" style="display: block; font-size: 18px; float: right; margin-right: 10px;" onclick="window.inboxVue.clear_navigation()"></span>
             </nav>
 
 
@@ -457,7 +505,7 @@ return `<!DOCTYPE html>
                     <div v-for="(step, index) in messages" :class="step.card_class" v-bind:id="'msg-card-'+index" v-on:click="showMessage(step,index)" v-bind:data-preview-id="index">
                         <div class="card-content">
                             <div class="msg-header">
-                                <span v-html="step.goal_text_highlighted"></span>
+                                <span v-html="step.goal_text_highlighted_elided"></span>
                                 <span class="msg-timestamp"></span>
                                 <span class="msg-attachment tag"><small>{{ step.goal_id }} - ({{step.rt}}|{{ step.id }})</small></span>
                             </div>
@@ -494,14 +542,13 @@ return `<!DOCTYPE html>
                 </div>
 
                 <br/>
-            </div>
+            </div>a
 
             <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                  ;; Message Pane
                  ;; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
 
             <div class="column is-7 message hero is-fullheight is-hidden" id="message-pane">
-
 
            <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 ;; Message Pane - Preview
@@ -521,12 +568,17 @@ return `<!DOCTYPE html>
                            <span class="tag is-info rid"></span>
                        </div>
 
-                       <div class="goal-id has-tooltip-arrow has-tooltip-left">
-                           <span class="mdi mdi-card-bulleted" style="float:left; margin-right: 10px; margin-top: 3px; font-size: 22px;"></span>
-                           <br/>
-                           <br/>
-                           <br/>
+                       <div class="tags has-addons" style="float:left; margin-right: 10px; margin-top: 3px;">
+                           <span class="tag">
+                              <span class="mdi mdi-card-bulleted" style="font-size: 12px;"></span>
+                              Goal
+                           </span>
+                           <span class="tag is-info goal_id"></span>
                        </div>
+                       
+                       <br/>
+                       <br/>
+                       <br/>
 
                        <div class="goal"></div>
 
@@ -538,6 +590,20 @@ return `<!DOCTYPE html>
             </div>
         </div>
 
+        <div id="quickviewDefault" class="quickview">
+           <header class="quickview-header">
+              <p class="title">Code snippet</p>
+              <span class="delete" data-dismiss="quickview"></span>
+            </header>
+
+            <div class="quickview-body">
+                <div class="quickview-block" id="snippet">
+                
+                </div>
+            </div>
+        </div>
+
+
         <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
              ;; Additional logic (JS)
              ;; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
@@ -545,7 +611,12 @@ return `<!DOCTYPE html>
         <script src="${jqueryUri}"></script>
         <script src="${vueUri}"></script>
         <script src="${fuzzUri}"></script>
+        <script src="${bulmaQVUri}"></script>
         <script src="${scriptUri}"></script>
+
+        <script>
+            
+        </script>
     </body>
 </html>`;
     }

@@ -1,5 +1,3 @@
-//@ts-check
-
 // This script will be run within the webview itself
 // It cannot access the main VS Code APIs directly.
 (function () {
@@ -15,6 +13,10 @@
                 // console.log('Got', message.html, 'for', message.indx);
                 window.inbox[message.indx].goal_text_highlighted = message.html;
                 break;
+            case 'highlight_elided':
+                    // console.log('Got', message.html, 'for', message.indx);
+                    window.inbox[message.indx].goal_text_highlighted_elided = message.html;
+                    break;
             case 'trace':
                 clear();
                 trace(message.trace);
@@ -30,6 +32,14 @@
                 break;
         }
     });
+
+    function elide(i, str) {
+
+        if (str.length < i)
+            return str;
+
+        return str.replace(str.slice(i,-i),' ... ');
+    }
 
     // /////////////////////////////////////////////////////////////////////////////
     // NOTE: Goal mapping refactoring helpers
@@ -193,7 +203,7 @@
         return id;
     }
 
-    function goal_text(step, index) {
+    function goal_text(step) {
 
         // console.log('goal_text:', JSON.stringify(step));
 
@@ -217,18 +227,6 @@
         } else {
             console.error('goal_text', 'Unknown step kind', kind);
         }
-
-// /////////////////////////////////////////////////////////////////////////////
-// DOING: Syntax highlighting
-// /////////////////////////////////////////////////////////////////////////////
-
-        vscode.postMessage({
-            command: 'highlight',
-            index: index,
-            value: text
-        });
-
-// /////////////////////////////////////////////////////////////////////////////
 
         return text;
     }
@@ -566,8 +564,10 @@ ${step.value.findall_solution_text}
             contents += `
 <article class="panel">
     <div class="panel-heading">
-        Cut branch for <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${step.value.cut_victims[i].cut_branch_for_goal.goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})">
-          ${step.value.cut_victims[i].cut_branch_for_goal.goal_text}
+        Cut branch for <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value.cut_victims[i].cut_branch_for_goal.goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
+	    contents += '\n\n' + step.value.cut_victims[i].cut_branch_for_goal.goal_text.replace(/['"]+/g, '');
+	    contents += `">
+          ${elide(20, step.value.cut_victims[i].cut_branch_for_goal.goal_text)}
         </span>
     </div>
 
@@ -604,8 +604,10 @@ ${step.value.findall_solution_text}
   <div>
 
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${step.value.suspend_sibling.goal_id} - - (${window.inbox[ds].rt}, ${window.inbox[ds].id})">
-        ${step.value.suspend_sibling.goal_text}
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${step.value.suspend_sibling.goal_id} - - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
+	    contents += '\n\n' + step.value.suspend_sibling.goal_text.replace(/['"]+/g, '');
+	    contents += `">
+        ${elide(20, step.value.suspend_sibling.goal_text)}
       </span>
     </div>
 
@@ -643,8 +645,10 @@ ${step.value.findall_solution_text}
 
             contents += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${step.value[i].goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})">
-        ${step.value[i].goal_text}
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${step.value[i].goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
+	    contents += '\n\n' + step.value[i].goal_text.replace(/['"]+/g, '');
+	    contents += `">
+        ${elide(20, step.value[i].goal_text)}
       </span>
     </div>
 `;
@@ -975,12 +979,13 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${rule_loc_file} (${rul
         if (r_id != undefined && s_id != undefined && g_id != undefined && g_id != 'none') {
             let ds = ids_for_rt_st_gl(r_id, s_id, g_id)[0];
 
-            fmt += `<span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${g_id} - (${r_id}|${s_id})">`;
+            fmt += `<span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${g_id} - (${r_id}|${s_id}) `;
+	    fmt += '\n\n' + rule_text.replace(/['"]+/g, '') + '">';
         } else {
             fmt += `<span>`;
         }
             fmt += `
-    ${rule_text}
+    ${elide(20, rule_text)}
   </span>
 </div>`;
 
@@ -994,7 +999,7 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${rule_loc_file} (${rul
         let fmt = "";
 
         for(var i = 0; i < element.length; i++)
-            fmt += '<div class="panel-element"><span style="float: right;" class="tag">Event</span><span style="float: left; margin-right: 10px;" class="tag">' + element[i].kind + '</span>' + element[i].value + '</div>';
+            fmt += '<div class="panel-element"><span style="float: right;" class="tag">Event</span><span style="float: left; margin-right: 10px;" class="tag">' + element[i].kind + '</span><span class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="' +  element[i].value.replace(/['"]+/g, '') + '">' + elide(20, element[i].value) + '</span></div>';
 
         return fmt;
     }
@@ -1022,10 +1027,10 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${rule_loc_file} (${rul
                 let card = entry.data;
                 let status = card.color.kind.toLowerCase();
 
-                fmt += '<div class="panel-element"><span class="tag tag-' + status + '" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ' + element[i].goal_id + '">' + element[i].goal_text + '</span></div>';
+                fmt += '<div class="panel-element"><span class="tag tag-' + status + '" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ' + element[i].goal_id + '\n\n' + element[i].goal_text.replace(/['"]+/g, '') + '">' + elide(20, element[i].goal_text) + '</span></div>';
 
             } else {
-                fmt += '<div class="panel-element"><span class="tag" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ' + element[i].goal_id + '">' + element[i].goal_text + '</span></div>';
+                fmt += '<div class="panel-element"><span class="tag" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ' + element[i].goal_id + '\n\n' + element[i].goal_text.replace(/['"]+/g, '') + '">' + elide(20, element[i].goal_text) + '</span></div>';
             }
         }
 
@@ -1056,7 +1061,7 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 `;
 
         fmt += `
-    <span>${attempt_text}</span>
+    <span class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_text.replace(/['"]+/g, '')}">${elide(20, attempt_text)}</span>
 </div>`;
 
         return fmt;
@@ -1091,8 +1096,10 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element.chr_new_goals[i].goal_id}">
-        ${element.chr_new_goals[i].goal_text}
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element.chr_new_goals[i].goal_id}`;
+	    fmt += '\n\n' + element.chr_new_goals[i].goal_text.replace(/['"]+/g, '');
+	    fmt += `">
+        ${elide(20, element.chr_new_goals[i].goal_text)}
       </span>
     </div>
 `;
@@ -1121,8 +1128,10 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element[i].goal_id}">
-        ${element[i].goal_text}
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element[i].goal_id}`;
+	    fmt += '\n\n' + element[i].goal_text.replace(/['"]+/g, '');
+	    fmt += `">
+        ${elide(20, element[i].goal_text)}
       </span>
     </div>
 `;
@@ -1157,8 +1166,10 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element[i].goal_id}">
-        ${element[i].goal_text}
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element[i].goal_id}`;
+	    fmt += '\n\n' + element[i].goal_text.replace(/['"]+/g, '');
+	    fmt += `">
+        ${elide(20, element[i].goal_text)}
       </span>
     </div>
 `;
@@ -1194,14 +1205,8 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 
         if (window.inboxVue !== undefined && window.inboxCount !== undefined) {
             window.inboxVue.clear();
-
-            window.goal_navigation_index = -1;
-
-            while(window.goal_navigation_stack.length > 0)
-                window.goal_navigation_stack.pop();
-
-            $("#back_b").addClass('inactive');
-            $("#forw_b").addClass('inactive');
+            window.inboxVue.clear_navigation();
+            
             $("#filter").val(''); filter('');
             $("#trace-information").val("");
         }
@@ -1273,8 +1278,10 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
                         data: data[i].step.value.findall_cards[j],
                         kind: goal_kind(data[i].step.value.findall_cards[j].step),
                         goal_id: goal_id(data[i].step.value.findall_cards[j].step),
-                        goal_text: goal_text(data[i].step.value.findall_cards[j].step, c),
-                        goal_text_highlighted: goal_text(data[i].step.value.findall_cards[j].step, c),
+                        goal_text: goal_text(data[i].step.value.findall_cards[j].step),
+                        goal_text_elided: '',
+                        goal_text_highlighted: '',
+                        goal_text_highlighted_elided: '',
                         goal_predicate: goal_predicate(data[i].step.value.findall_cards[j].step),
                         status: goal_status(data[i].step.value.findall_cards[j]),
                         // status_label: goal_status_label(data[i].step.value.findall_cards[j], data, data[i].step.value.findall_cards[j].runtime_id),
@@ -1333,8 +1340,10 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
                             data: data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k],
                             kind: goal_kind(data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k].step),
                             goal_id: goal_id(data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k].step),
-                            goal_text: goal_text(data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k].step, c),
-                            goal_text_highlighted: goal_text(data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k].step, c),
+                            goal_text: goal_text(data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k].step),
+                            goal_text_elided: '',
+                            goal_text_highlighted: '',
+                            goal_text_highlighted_elided: '',
                             goal_predicate: goal_predicate(data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k].step),
                             status: goal_status(data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k]),
                             // status_label: goal_status_label(data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k], data, data[i].step.value.chr_failed_attempts[j].chr_condition_cards[k].runtime_id),
@@ -1385,8 +1394,10 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
                             data: data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k],
                             kind: goal_kind(data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k].step),
                             goal_id: goal_id(data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k].step),
-                            goal_text: goal_text(data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k].step, c),
-                            goal_text_highlighted: goal_text(data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k].step, c),
+                            goal_text: goal_text(data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k].step),
+                            goal_text_elided: '',
+                            goal_text_highlighted: '',
+                            goal_text_highlighted_elided: '',
                             goal_predicate: goal_predicate(data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k].step),
                             status: goal_status(data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k]),
                             // status_label: goal_status_label(data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k], data, data[i].step.value.chr_successful_attempts[j].chr_attempt.chr_condition_cards[k].runtime_id),
@@ -1433,8 +1444,10 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
                 data: data[i],
                 kind: goal_kind(data[i].step),
                 goal_id: goal_id(data[i].step),
-                goal_text: goal_text(data[i].step, c),
-                goal_text_highlighted: goal_text(data[i].step, c),
+                goal_text: goal_text(data[i].step),
+                goal_text_elided: '',
+                goal_text_highlighted: '',
+                goal_text_highlighted_elided: '',
                 goal_predicate: goal_predicate(data[i].step),
                 status: goal_status(data[i]),
                 // status_label: goal_status_label(data[i], data, data[i].runtime_id),
@@ -1460,8 +1473,30 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 
         window.inboxCount = c;
 
-        for (var i = 0; i < c; i++)
+        for (var i = 0; i < c; i++) {
+        
             window.inbox[i].status_label = goal_status_label(window.inbox[i].data, data, window.inbox[i].rt);
+        
+// /////////////////////////////////////////////////////////////////////////////
+// Syntax highlighting
+// /////////////////////////////////////////////////////////////////////////////
+
+            window.inbox[i].goal_text_elided = elide(15, window.inbox[i].goal_text);
+
+            vscode.postMessage({
+                command: 'highlight',
+                index: i,
+                value: window.inbox[i].goal_text
+            });
+
+            vscode.postMessage({
+                command: 'highlight_elided',
+                index: i,
+                value: window.inbox[i].goal_text_elided
+            });
+
+// /////////////////////////////////////////////////////////////////////////////
+        }
 
 // /////////////////////////////////////////////////////////////////////////////
 
@@ -1507,7 +1542,6 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
                         }
                     }
                 },
-
                 showMessage: function(msg, index) {
 
                     // console.log('Try & show message', window.switch_anyways, msg.rt, window.current_rt, msg.id, window.current_id);
@@ -1527,8 +1561,20 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
                     $('.card-indented-last').removeClass('active');
                     $('#msg-card-' + index).addClass('active');
 
-                    $('.message .goal').html(msg.goal_text_highlighted);
-                    $('.message .goal-id').attr("data-tooltip", 'Goal ID:' + msg.goal_id);
+                    let totp = msg.goal_text.replace(/['"]+/g, '');
+
+                    let code = `
+<div onclick="window.inboxVue.set_snippet(${index});">
+`;
+                    code += msg.goal_text_highlighted_elided;
+                    code += `
+</div>
+`;
+                    $('.message .goal').html(code);
+		    
+                    // $('.message .goal').html(msg.goal_text_highlighted);
+
+                    $('.message .goal_id').html(msg.goal_id);
 
                     $('.message .top .tags .rid').text(msg.rt);
                     $('.message .top .tags .sid').text(msg.id);
@@ -1569,6 +1615,8 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
                             msg: msg,
                             index: index
                         });
+
+                        $("#nav_clear").removeClass('is-hidden');
                     }
 
                     if (window.goal_navigation_stack.length > 1)
@@ -1629,6 +1677,32 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
                     $('#message-pane').addClass('is-hidden');
 
                     window.inboxCount = 0;
+                },
+                clear_navigation: function() {
+                    window.goal_navigation_index = -1;
+
+                    while(window.goal_navigation_stack.length > 0)
+                        window.goal_navigation_stack.pop();
+        
+                    $("#back_b").addClass('inactive');
+                    $("#forw_b").addClass('inactive');
+
+                    $("#nav_clear").addClass('is-hidden');
+                },
+                set_snippet: (index) => {
+
+                    console.log('Setting snippet for index', index);
+            
+                    $("#snippet").html(window.inbox[index].goal_text_highlighted);
+                    
+                    console.log(quickviews);
+                    console.log(quickviews[0]);
+                    
+                    quickviews[0].quickview.classList.toggle('is-active');
+                    quickviews[0].emit('quickview:toggle', {
+                          element: quickviews[0].element,
+                        quickview: quickviews[0].quickview,
+                    });
                 },
                 hop: function(destination) {
                     vscode.postMessage({
@@ -1758,5 +1832,7 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
     //         });
     //     }
     // });
+
+    var quickviews = bulmaQuickview.attach();
 
 }());

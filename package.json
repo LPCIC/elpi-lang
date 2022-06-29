@@ -56,7 +56,6 @@
 				"command": "elpi.watch_start",
 				"category": "Elpi Tracer",
 				"title": "Start watching",
-				
 				"icon": "$(debug-alt)"
 			},
 			{
@@ -77,17 +76,17 @@
 			"properties": {
 				"elpi.elpi.options": {
 					"type": "string",
-    				"default": "-no-tc -trace-on json /tmp/foo.json -trace-at run 0 999 -trace-only user",
-					"markdownDescription": "Path to `elpi` binray"
+					"default": "-no-tc -trace-on json /tmp/foo.json -trace-at run 0 999 -trace-only user",
+					"markdownDescription": "Command line arguments"
 				},
 				"elpi.elpi.path": {
 					"type": "string",
-    				"default": "elpi",
+					"default": "elpi",
 					"markdownDescription": "Path to `elpi` binary (or elpi from `$PATH`)"
 				},
 				"elpi.elpi_trace_elaborator.path": {
 					"type": "string",
-    				"default": "elpi-trace-elaborator",
+					"default": "elpi-trace-elaborator",
 					"markdownDescription": "Path to `elpi-trace-elaborator` (or elpi from `$PATH`)"
 				}
 			}
@@ -130,17 +129,17 @@
 					"when": "view == elpi.tracer"
 				},
 				{
-					"command": "elpi.watch_start",
+					"command": "elpi.clear",
 					"group": "navigation@3",
 					"when": "view == elpi.tracer"
 				},
 				{
-					"command": "elpi.watch_stop",
+					"command": "elpi.watch_start",
 					"group": "navigation@4",
 					"when": "view == elpi.tracer"
 				},
 				{
-					"command": "elpi.clear",
+					"command": "elpi.watch_stop",
 					"group": "navigation@5",
 					"when": "view == elpi.tracer"
 				}
@@ -174,6 +173,7 @@
 		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json",
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
+		
 		"lint": "eslint . --ext .ts,.tsx",
 		"watch": "tsc -w -p ./"
 	},
@@ -184,8 +184,9 @@
 		"@typescript-eslint/parser": "^5.19.0",
 		"child-process": "^1.0.2",
 		"eslint": "^8.13.0",
-		"typescript": "^4.6.3",
-		"mustache": "^4.0.1"
+		"mustache": "^4.0.1",
+		"tmp": "^0.2.1",
+		"typescript": "^4.6.3"
 	},
 	"dependencies": {
 		"chokidar": "^3.5.3",
