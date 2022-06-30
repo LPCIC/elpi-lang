@@ -4,6 +4,7 @@ import * as parser from './trace';
 import    os = require('node:os');
 import    cp = require('child_process');
 import    fs = require('fs');
+// import   tmp = require('tmp');
 import shiki = require('shiki');
 
 import chokidar = require('chokidar');
@@ -21,6 +22,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
     private _source: string;
     private _target: string;
+    private _target_raw: string;
+    private _target_dir: string;
     private _watcher: chokidar.FSWatcher | undefined;
     private _watcher_target: string;
     private _watcher_target_elaborated: string;
@@ -30,7 +33,17 @@ export class TraceProvider implements vscode.WebviewViewProvider {
     constructor(
         private readonly _extensionUri: vscode.Uri,
     ) {
-        const elpi_lang_grammer = JSON.parse(fs.readFileSync(vscode.Uri.joinPath(this._extensionUri, 'syntaxes', 'elpi.tmLanguage.json').path, 'utf8'));
+        
+        this._channel.appendLine("Running extension for " + os.platform() + " - " + os.release());
+
+        let elpi_lang_grammar_path = vscode.Uri.joinPath(this._extensionUri, 'syntaxes', 'elpi.tmLanguage.json').path;
+
+        if (os.platform().toString().toLowerCase() == "win32")
+            elpi_lang_grammar_path = elpi_lang_grammar_path.slice(1);
+        
+        this._channel.appendLine("Loading grammar file " + elpi_lang_grammar_path);
+
+        const elpi_lang_grammer = JSON.parse(fs.readFileSync(elpi_lang_grammar_path, 'utf8'));
         const elpi_lang = {
             id: "elpi",
             scopeName: 'source.elpi',
@@ -44,19 +57,24 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         this._options_default = "";
 
         this._source = "";
-        this._target = "/tmp/trace.json";
+        
+        if (os.platform().toString().toLowerCase() == "win32")
+            this._target_dir = process.env.APPDATA + '\\';
+        else
+            this._target_dir = '/tmp/';
 
-        this._watcher_target = "/tmp/traced.tmp.json";
-        this._watcher_target_elaborated = "/tmp/traced.json";
+        this._target = this._target_dir + "trace.json";
+        this._target_raw = this._target_dir + "trace.tmp.json";
+
+        this._watcher_target = this._target_dir + "traced.tmp.json";
+        this._watcher_target_elaborated = this._target_dir + "traced.json";
 
         shiki.getHighlighter({theme: 'css-variables'}).then(highlighter => {
             this._highlighter = highlighter;
             this._highlighter.loadLanguage(elpi_lang);
         });
 
-        this._channel.appendLine("Running extension for " + os.platform() + " - " + os.release());
-
-        if (os.platform().toString().toLowerCase() == "windows")
+        if (os.platform().toString().toLowerCase() == "win32")
             this._cat = "type";
         else
             this._cat = "cat";
@@ -329,20 +347,16 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         // --
 
+        if(os.platform().toString().toLowerCase() == "win32")
+            this.exec('cd ' + this._target_dir);
+
         // this.exec("eval $(opam env) && " + this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
-        this.exec(this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
+        this.exec(this._elpi + " " + this._options + " " + this._options_default.replace('[OUTPUT]', this._target_raw) + " " + current_file);
             
         // cp.execSync(this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
         
-        this.exec("cat /tmp/foo.json | " + this._elpi_trace_elaborator + " > " + this._target);
+        this.exec(this._cat + " " + this._target_raw + " | " + this._elpi_trace_elaborator + " > " + this._target);
         
-        // const cat = cp.spawn(this._cat, ["/tmp/foo.json"]);
-        // const elb = cp.spawn(this._elpi_trace_elaborator);
-        // const out = fs.createWriteStream(this._target);
-        
-        // cat.stdout.pipe(elb.stdin);
-        // elb.stdout.pipe(out);
-
         // --
 
         if(!fs.existsSync(this._target)) {
@@ -355,7 +369,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         // --
 
-        this._source = "/tmp/foo.json";
+        this._source = this._target_raw;
 
         // --
 

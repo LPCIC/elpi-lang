@@ -76,7 +76,7 @@
 			"properties": {
 				"elpi.elpi.options": {
 					"type": "string",
-					"default": "-no-tc -trace-on json /tmp/foo.json -trace-at run 0 999 -trace-only user",
+					"default": "-no-tc -trace-on json [OUTPUT] -trace-at run 0 999 -trace-only user",
 					"markdownDescription": "Command line arguments"
 				},
 				"elpi.elpi.path": {
@@ -185,7 +185,6 @@
 		"child-process": "^1.0.2",
 		"eslint": "^8.13.0",
 		"mustache": "^4.0.1",
-		"tmp": "^0.2.1",
 		"typescript": "^4.6.3"
 	},
 	"dependencies": {
