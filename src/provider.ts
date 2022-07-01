@@ -235,7 +235,10 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
                 this._channel.appendLine("Opening raw trace: " + fileUri[0].fsPath);
 
-                this.exec("eval $(opam env) && sleep 1 && cat " + fileUri[0].fsPath + " | " + this._elpi_trace_elaborator + " > " + this._target);
+                if (this._view)
+                    this._view.webview.postMessage({ type: 'progress', state: 'on' });
+
+                this.exec(this._cat + " " + fileUri[0].fsPath + " | " + this._elpi_trace_elaborator + " > " + this._target);
 
                 const trace = parser.readTrace(JSON.parse(fs.readFileSync(this._target, 'utf8')));
 
@@ -243,6 +246,9 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
                 if (this._view)
                     this._view.webview.postMessage({ type: 'trace', trace: trace, file: fileUri[0].fsPath });
+                
+                if (this._view)
+                    this._view.webview.postMessage({ type: 'progress', state: 'off' });
             }
         });
     }
@@ -395,6 +401,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         const  styleBulmaDVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-divider.css'));
         const  styleBulmaTTUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-tooltip.css'));
         const  styleBulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-quickview.min.css'));
+        const  styleBulmaPLUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-pageloader.min.css'));
         const      styleMDIUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'materialdesignicons.css'));
         const     styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css'));
 
@@ -411,6 +418,7 @@ return `<!DOCTYPE html>
         <link href="${styleBulmaDVUri}" rel="stylesheet">
         <link href="${styleBulmaTTUri}" rel="stylesheet">
         <link href="${styleBulmaQVUri}" rel="stylesheet">
+        <link href="${styleBulmaPLUri}" rel="stylesheet">
         <link href="${styleMDIUri}" rel="stylesheet">
         <link href="${styleMainUri}" rel="stylesheet">
 
@@ -572,17 +580,17 @@ return `<!DOCTYPE html>
 
                    <div class="top">
 
-                       <div class="tags has-addons" style="float:right; margin-top: 10px;">
+                       <div class="tags has-addons" style="float:right; margin-top: 5px;">
                            <span class="tag">Step</span>
                            <span class="tag is-info sid"></span>
                        </div>
 
-                       <div class="tags has-addons" style="float:right; margin-right: 10px; margin-top: 10px;">
+                       <div class="tags has-addons" style="float:right; margin-right: 10px; margin-top: 5px;">
                            <span class="tag">Runtime</span>
                            <span class="tag is-info rid"></span>
                        </div>
 
-                       <div class="tags has-addons" style="float:left; margin-right: 10px; margin-top: 3px;">
+                       <div class="tags has-addons" style="float:left; margin-right: 10px; margin-top: 5px;">
                            <span class="tag">
                               <span class="mdi mdi-card-bulleted" style="font-size: 12px;"></span>
                               Goal
@@ -617,6 +625,9 @@ return `<!DOCTYPE html>
             </div>
         </div>
 
+        <div id="loader" class="pageloader">
+            <span class="title">Computing trace</span>
+        </div>
 
         <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
              ;; Additional logic (JS)

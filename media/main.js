@@ -28,6 +28,12 @@
             case 'watcher':
                 update_watcher_state(message.status);
                 break;
+            case 'progress':
+                if (message.state == 'on')
+                    $('#loader').addClass('is-active');
+                else
+                    $('#loader').removeClass('is-active');
+                break;
             default:
                 break;
         }
@@ -604,7 +610,7 @@ ${step.value.findall_solution_text}
   <div>
 
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${step.value.suspend_sibling.goal_id} - - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value.suspend_sibling.goal_id} - - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
 	    contents += '\n\n' + step.value.suspend_sibling.goal_text.replace(/['"]+/g, '');
 	    contents += `">
         ${elide(20, step.value.suspend_sibling.goal_text)}
@@ -645,7 +651,7 @@ ${step.value.findall_solution_text}
 
             contents += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${step.value[i].goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value[i].goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
 	    contents += '\n\n' + step.value[i].goal_text.replace(/['"]+/g, '');
 	    contents += `">
         ${elide(20, step.value[i].goal_text)}
@@ -709,7 +715,8 @@ ${step.value.findall_solution_text}
 
 // /////////////////////////////////////////////////////////////////////////////
 
-    function format_failed_attempts(element, r_id, s_id) {
+    function format_failed_attempts(element, r_id, s_id)
+    {
         // console.log('Formatting failed attempts', JSON.stringify(element));
 
         let contents = "";
@@ -798,7 +805,7 @@ ${step.value.findall_solution_text}
         for(var i = 0; i < destinations.length; i++) {
             contents += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${destinations[i][2]});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${destinations[i][1]}">
+      <span onclick="inboxVue.jump(${destinations[i][2]});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${destinations[i][1]}">
         ${destinations[i][0]}
       </span>
     </div>
@@ -956,7 +963,7 @@ ${step.value.findall_solution_text}
                 fmt += `
     <span style="float: right;" class="tag"
 onclick="inboxVue.hop('${rule_loc_file} (${rule_loc_character}@L${rule_loc_line}:C${rule_loc_column})')"
-class="has-tooltip-arrow has-tooltip-left" data-tooltip="${rule_loc_file} (${rule_loc_character}@L${rule_loc_line}:C${rule_loc_column})">
+class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${rule_loc_character}@L${rule_loc_line}:C${rule_loc_column})">
       ${rule_loc_type} Location
     </span>
 `;
@@ -967,7 +974,7 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${rule_loc_file} (${rul
                 const rule_loc_ctx = element.value.rule_loc.value;
 
                 fmt += `
-    <span style="float: right;" class="tag" class="has-tooltip-arrow has-tooltip-left" data-tooltip="${rule_loc_ctx}">
+    <span style="float: right;" class="tag" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_ctx}">
       ${rule_loc_type} Location
     </span>
 `;
@@ -979,8 +986,8 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${rule_loc_file} (${rul
         if (r_id != undefined && s_id != undefined && g_id != undefined && g_id != 'none') {
             let ds = ids_for_rt_st_gl(r_id, s_id, g_id)[0];
 
-            fmt += `<span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${g_id} - (${r_id}|${s_id}) `;
-	    fmt += '\n\n' + rule_text.replace(/['"]+/g, '') + '">';
+            fmt += `<span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${g_id} - (${r_id}|${s_id}) `;
+            fmt += '\n\n' + rule_text.replace(/['"]+/g, '') + '">';
         } else {
             fmt += `<span>`;
         }
@@ -1027,10 +1034,10 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${rule_loc_file} (${rul
                 let card = entry.data;
                 let status = card.color.kind.toLowerCase();
 
-                fmt += '<div class="panel-element"><span class="tag tag-' + status + '" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ' + element[i].goal_id + '\n\n' + element[i].goal_text.replace(/['"]+/g, '') + '">' + elide(20, element[i].goal_text) + '</span></div>';
+                fmt += '<div class="panel-element"><span class="tag tag-' + status + '" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ' + element[i].goal_id + '\n\n' + element[i].goal_text.replace(/['"]+/g, '') + '">' + elide(20, element[i].goal_text) + '</span></div>';
 
             } else {
-                fmt += '<div class="panel-element"><span class="tag" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ' + element[i].goal_id + '\n\n' + element[i].goal_text.replace(/['"]+/g, '') + '">' + elide(20, element[i].goal_text) + '</span></div>';
+                fmt += '<div class="panel-element"><span class="tag" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ' + element[i].goal_id + '\n\n' + element[i].goal_text.replace(/['"]+/g, '') + '">' + elide(20, element[i].goal_text) + '</span></div>';
             }
         }
 
@@ -1055,13 +1062,13 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${rule_loc_file} (${rul
         fmt += `
     <span style="float: right;" class="tag"
 onclick="inboxVue.hop('${attempt_loc_file} (${attempt_loc_character}@L${attempt_loc_line}:C${attempt_loc_column})')"
-class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${attempt_loc_character}@L${attempt_loc_line}:C${attempt_loc_column})">
+class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (${attempt_loc_character}@L${attempt_loc_line}:C${attempt_loc_column})">
       File Location
     </span>
 `;
 
         fmt += `
-    <span class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_text.replace(/['"]+/g, '')}">${elide(20, attempt_text)}</span>
+    <span class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_text.replace(/['"]+/g, '')}">${elide(20, attempt_text)}</span>
 </div>`;
 
         return fmt;
@@ -1081,7 +1088,7 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element.chr_removed_goals[i]}">
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element.chr_removed_goals[i]}">
         ${element.chr_removed_goals[i]}
       </span>
     </div>
@@ -1096,7 +1103,7 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element.chr_new_goals[i].goal_id}`;
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element.chr_new_goals[i].goal_id}`;
 	    fmt += '\n\n' + element.chr_new_goals[i].goal_text.replace(/['"]+/g, '');
 	    fmt += `">
         ${elide(20, element.chr_new_goals[i].goal_text)}
@@ -1128,7 +1135,7 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element[i].goal_id}`;
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}`;
 	    fmt += '\n\n' + element[i].goal_text.replace(/['"]+/g, '');
 	    fmt += `">
         ${elide(20, element[i].goal_text)}
@@ -1166,7 +1173,7 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-left" data-tooltip="Goal ID: ${element[i].goal_id}`;
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}`;
 	    fmt += '\n\n' + element[i].goal_text.replace(/['"]+/g, '');
 	    fmt += `">
         ${elide(20, element[i].goal_text)}
@@ -1481,7 +1488,7 @@ class="has-tooltip-arrow has-tooltip-left" data-tooltip="${attempt_loc_file} (${
 // Syntax highlighting
 // /////////////////////////////////////////////////////////////////////////////
 
-            window.inbox[i].goal_text_elided = elide(15, window.inbox[i].goal_text);
+            window.inbox[i].goal_text_elided = elide(25, window.inbox[i].goal_text);
 
             vscode.postMessage({
                 command: 'highlight',
