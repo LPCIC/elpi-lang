@@ -136,6 +136,24 @@ export class TraceProvider implements vscode.WebviewViewProvider {
     
                 break;
             }
+            case 'highlight_inline':
+            {
+                const code = message.value;
+                const id = message.id;
+                let html = undefined;
+                
+                if (this._highlighter)
+                    html = this._highlighter.codeToHtml(code, { lang: 'elpi' });
+                
+                if (this._view)
+                    this._view.webview.postMessage({
+                        type: 'highlight_inline',
+                        html: html,
+                        id: id
+                    });
+    
+                break;
+            }
             case 'notify':
             {
                 vscode.window.showInformationMessage(message.value);
@@ -393,6 +411,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         const         vueUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vue.js'));
         const        fuzzUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'fuzzball.umd.min.js'));
         const     bulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-quickview.js'));
+        const     bulmaACUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-collapsible.min.js'));
+        const      popperUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'popper.min.js'));
         const      scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
 
         const    styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
@@ -402,6 +422,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         const  styleBulmaTTUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-tooltip.css'));
         const  styleBulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-quickview.min.css'));
         const  styleBulmaPLUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-pageloader.min.css'));
+        const  styleBulmaACUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-collapsible.min.css'));
         const      styleMDIUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'materialdesignicons.css'));
         const     styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css'));
 
@@ -419,6 +440,7 @@ return `<!DOCTYPE html>
         <link href="${styleBulmaTTUri}" rel="stylesheet">
         <link href="${styleBulmaQVUri}" rel="stylesheet">
         <link href="${styleBulmaPLUri}" rel="stylesheet">
+        <link href="${styleBulmaACUri}" rel="stylesheet">
         <link href="${styleMDIUri}" rel="stylesheet">
         <link href="${styleMainUri}" rel="stylesheet">
 
@@ -527,15 +549,21 @@ return `<!DOCTYPE html>
                     <div v-for="(step, index) in messages" :class="step.card_class" v-bind:id="'msg-card-'+index" v-on:click="showMessage(step,index)" v-bind:data-preview-id="index">
                         <div class="card-content">
                             <div class="msg-header">
-                                <span v-html="step.goal_text_highlighted_elided"></span>
+                                <span v-bind:id="'popcard-'+index" v-html="step.goal_text_highlighted_elided" aria-describedby="tooltip"></span>
+    
+    <div class="poptip" v-bind:id="'popttip-'+index" role="tooltip">
+      
+
+      <div v-html="step.goal_text_highlighted"></div>
+      <div id="arrow" data-popper-arrow></div>
+    </div>
+
                                 <span class="msg-timestamp"></span>
                                 <span class="msg-attachment tag"><small>{{ step.goal_id }} - ({{step.rt}}|{{ step.id }})</small></span>
                             </div>
                             <div class="msg-subject">
                                 <strong>Kind:</strong> {{ step.kind }}
                             </div>
-                           <!--      <span :class="step.status"></span> -->
-                           <!-- </div> -->
                             <div class="msg-snippet">
                                 <span v-if="step.kind == 'Inference'"><strong>Predicate:</strong> {{ step.goal_predicate }}</span>
                                 <span v-if="step.kind == 'Init'">Entry point</span>
@@ -548,14 +576,13 @@ return `<!DOCTYPE html>
                                     <button class="button is-small" style="width: 100%" v-on:click.stop="toggleSubCards(step.rt_sub)">Toggle</button>
                                 </span>
                             </div>
-<div class="msg-footer" v-if="step.status_label.length > 0">
-    <strong>Next:</strong>
-    <a v-for="entry in step.status_label" v-on:click.stop="jump(entry[2]);">
-        {{entry[0]}}
-        <span> </span>
-    </a>
-</div>
-
+                           <div class="msg-footer" v-if="step.status_label.length > 0">
+                               <strong>Next:</strong>
+                               <a v-for="entry in step.status_label" v-on:click.stop="jump(entry[2]);">
+                                   {{entry[0]}}
+                                   <span> </span>
+                               </a>
+                           </div>
                         </div>
                         <div :class="step.footer">
 
@@ -637,11 +664,9 @@ return `<!DOCTYPE html>
         <script src="${vueUri}"></script>
         <script src="${fuzzUri}"></script>
         <script src="${bulmaQVUri}"></script>
+        <script src="${bulmaACUri}"></script>
+        <script src="${popperUri}"></script>
         <script src="${scriptUri}"></script>
-
-        <script>
-            
-        </script>
     </body>
 </html>`;
     }

@@ -17,6 +17,9 @@
                     // console.log('Got', message.html, 'for', message.indx);
                     window.inbox[message.indx].goal_text_highlighted_elided = message.html;
                     break;
+            case 'highlight_inline':
+                $('#' + message.id).html(message.html);
+                break;
             case 'trace':
                 clear();
                 trace(message.trace);
@@ -598,6 +601,8 @@ ${step.value.findall_solution_text}
 
         // console.log('format_suspend', JSON.stringify(card));
 
+        let rule_id = r_id + '-' + s_id + '-' + 'sus' + '-' + window.rnb++;
+
         let ds = ids_for_rt_gl(r_id, step.value.suspend_sibling.goal_id)[0];
 
         let contents = "<hr/>";
@@ -610,18 +615,29 @@ ${step.value.findall_solution_text}
   <div>
 
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value.suspend_sibling.goal_id} - - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
-	    contents += '\n\n' + step.value.suspend_sibling.goal_text.replace(/['"]+/g, '');
-	    contents += `">
+       <span style="float: right;" class="tag tag-spaced">
+          <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+          </a>
+      </span>
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value.suspend_sibling.goal_id} - - (${window.inbox[ds].rt}, ${window.inbox[ds].id})">
         ${elide(20, step.value.suspend_sibling.goal_text)}
       </span>
     </div>
-
+    <div id="${rule_id}" class="is-collapsible rule-inline">
+       ${step.value.suspend_sibling.goal_text}
+    </div>
   </div>
   <div class="panel-element panel-element-footer"></div>
 </article>
 <br/>
 `;
+
+        vscode.postMessage({
+            command: 'highlight_inline',
+            id: rule_id,
+            value: step.value.suspend_sibling.goal_text
+        });
 
         contents += format_stack(step.value.suspend_stack, r_id, s_id);
 
@@ -647,17 +663,32 @@ ${step.value.findall_solution_text}
 
         for(var i = 0; i < step.value.length; i++) {
 
+            let rule_id = r_id + '-' + s_id + '-' + 'res' + '-' + window.rnb++;
+
             let ds = ids_for_rt_gl(r_id, step.value[i].goal_id)[0];
 
             contents += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value[i].goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
-	    contents += '\n\n' + step.value[i].goal_text.replace(/['"]+/g, '');
-	    contents += `">
+      <span style="float: right;" class="tag tag-spaced">
+          <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+          </a>
+      </span>
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value[i].goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})">
         ${elide(20, step.value[i].goal_text)}
       </span>
     </div>
+    <div id="${rule_id}" class="is-collapsible rule-inline">
+       ${step.value[i].goal_text}
+    </div>
 `;
+
+            vscode.postMessage({
+                command: 'highlight_inline',
+                id: rule_id,
+                value: step.value[i].goal_text
+            });
+
         }
 
       contents += `
@@ -936,6 +967,7 @@ ${step.value.findall_solution_text}
         const rule_type = element.kind;
 
         let rule_text = "";
+        let rule_id = r_id + '-' + s_id + '-' + g_id + '-' + window.rnb++;
 
         if (rule_type == "UserRule")
             rule_text = element.value.rule_text;
@@ -983,18 +1015,33 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
 
         fmt += `<span style="float: right;" class="tag tag-spaced">${rule_type}</span>`;
 
+        fmt += `<span style="float: right;" class="tag tag-spaced">
+                   <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+                      <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+                   </a>
+                </span>`
+
         if (r_id != undefined && s_id != undefined && g_id != undefined && g_id != 'none') {
             let ds = ids_for_rt_st_gl(r_id, s_id, g_id)[0];
 
-            fmt += `<span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${g_id} - (${r_id}|${s_id}) `;
-            fmt += '\n\n' + rule_text.replace(/['"]+/g, '') + '">';
+            fmt += `<span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${g_id} - (${r_id}|${s_id})">`;
         } else {
             fmt += `<span>`;
         }
             fmt += `
     ${elide(20, rule_text)}
   </span>
+
+</div>
+<div id="${rule_id}" class="is-collapsible rule-inline">
+   ${rule_text}
 </div>`;
+
+        vscode.postMessage({
+            command: 'highlight_inline',
+            id: rule_id,
+            value: rule_text
+        });
 
         return fmt;
     }
@@ -1005,8 +1052,34 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
 
         let fmt = "";
 
-        for(var i = 0; i < element.length; i++)
-            fmt += '<div class="panel-element"><span style="float: right;" class="tag">Event</span><span style="float: left; margin-right: 10px;" class="tag">' + element[i].kind + '</span><span class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="' +  element[i].value.replace(/['"]+/g, '') + '">' + elide(20, element[i].value) + '</span></div>';
+        for(var i = 0; i < element.length; i++) {
+
+            let rule_id = r_id + '-' + s_id + '-' + 'evt' + '-' + window.rnb++;
+
+            fmt += `<div class="panel-element">
+                       <span style="float: right;" class="tag">Event</span>
+                       <span style="float: right;" class="tag tag-spaced">
+                          <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+                             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+                          </a>
+                       </span>
+                       <span style="float: left; margin-right: 10px;" class="tag">
+                          ${element[i].kind}
+                       </span>
+                       <span>
+                         ${elide(20, element[i].value)}
+                       </span>
+                    </div>
+                    <div id="${rule_id}" class="is-collapsible rule-inline">
+                       ${element[i].value}
+                    </div>`;
+        
+            vscode.postMessage({
+                command: 'highlight_inline',
+                id: rule_id,
+                value: element[i].value
+            });
+        }
 
         return fmt;
     }
@@ -1022,6 +1095,8 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
             // console.log('1', window.goal_to_index.get(element[i].goal_id));
             // console.log('2', window.inbox[window.goal_to_index.get(element[i].goal_id)]);
 
+            let rule_id = r_id + '-' + s_id + '-' + 'sib' + '-' + window.rnb++;
+
             let idxes = ids_for_rt_gl_not(r_id, element[i].goal_id, s_id); // window.goal_to_index.get(element[i].goal_id)
 
             let index = idxes[0];
@@ -1034,11 +1109,42 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                 let card = entry.data;
                 let status = card.color.kind.toLowerCase();
 
-                fmt += '<div class="panel-element"><span class="tag tag-' + status + '" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ' + element[i].goal_id + '\n\n' + element[i].goal_text.replace(/['"]+/g, '') + '">' + elide(20, element[i].goal_text) + '</span></div>';
-
+                fmt += `<div class="panel-element">
+                          <span class="tag tag-${status}" style="float: right;">Sibling</span>
+                          <span style="float: right;" class="tag tag-spaced">
+                             <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+                                <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+                             </a>
+                          </span>
+                          <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}">
+                             ${elide(20, element[i].goal_text)}
+                          </span>
+                        </div>
+                        <div id="${rule_id}" class="is-collapsible rule-inline">
+                           ${element[i].goal_text}
+                        </div>`;
             } else {
-                fmt += '<div class="panel-element"><span class="tag" style="float: right;">Sibling</span>' + '<span onclick="inboxVue.jump(' + ds + ');" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ' + element[i].goal_id + '\n\n' + element[i].goal_text.replace(/['"]+/g, '') + '">' + elide(20, element[i].goal_text) + '</span></div>';
+                fmt += `<div class="panel-element">
+                          <span class="tag" style="float: right;">Sibling</span>
+                          <span style="float: right;" class="tag tag-spaced">
+                             <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+                                <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+                             </a>
+                          </span>
+                          <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}">
+                             ${elide(20, element[i].goal_text)}
+                          </span>
+                        </div>
+                        <div id="${rule_id}" class="is-collapsible rule-inline">
+                           ${element[i].goal_text}
+                        </div>`;
             }
+
+            vscode.postMessage({
+                command: 'highlight_inline',
+                id: rule_id,
+                value: element[i].goal_text
+            });
         }
 
         return fmt;
@@ -1047,6 +1153,8 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
     function format_chr_attempt(element, r_id, s_id) {
 
         // console.log('Formatting CHR attempt', JSON.stringify(element));
+
+        let rule_id = r_id + '-' + s_id + '-' + 'cha' + '-' + window.rnb++;
 
         let attempt_text = element.chr_text;
 
@@ -1065,11 +1173,25 @@ onclick="inboxVue.hop('${attempt_loc_file} (${attempt_loc_character}@L${attempt_
 class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (${attempt_loc_character}@L${attempt_loc_line}:C${attempt_loc_column})">
       File Location
     </span>
+    <span style="float: right;" class="tag tag-spaced">
+    <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+       <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+    </a>
+</span>
 `;
 
         fmt += `
-    <span class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_text.replace(/['"]+/g, '')}">${elide(20, attempt_text)}</span>
+    <span>${elide(20, attempt_text)}</span>
+</div>
+<div id="${rule_id}" class="is-collapsible rule-inline">
+   ${attempt_text}
 </div>`;
+
+        vscode.postMessage({
+            command: 'highlight_inline',
+            id: rule_id,
+            value: attempt_text
+        });
 
         return fmt;
     }
@@ -1099,17 +1221,31 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 
         for(var i = 0; i < element.chr_new_goals.length; i++) {
 
+            let rule_id = r_id + '-' + s_id + '-' + 'csa' + '-' + window.rnb++;
+
             let ds = ids_for_rt_gl(r_id, element.chr_new_goals[i].goal_id)[0];
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element.chr_new_goals[i].goal_id}`;
-	    fmt += '\n\n' + element.chr_new_goals[i].goal_text.replace(/['"]+/g, '');
-	    fmt += `">
+       <span style="float: right;" class="tag tag-spaced">
+          <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+          </a>
+      </span>
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element.chr_new_goals[i].goal_id}">
         ${elide(20, element.chr_new_goals[i].goal_text)}
       </span>
     </div>
+    <div id="${rule_id}" class="is-collapsible rule-inline">
+       ${element.chr_new_goals[i].goal_text}
+    </div>
 `;
+
+            vscode.postMessage({
+                command: 'highlight_inline',
+                id: rule_id,
+                value: element.chr_new_goals[i].goal_text
+            });
         }
 
         return fmt;
@@ -1131,21 +1267,36 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 
         for(var i = 0; i < element.length; i++) {
 
+            let rule_id = r_id + '-' + s_id + '-' + 'cstb' + '-' + window.rnb++;
+
             let ds = ids_for_rt_gl(r_id, element[i].goal_id)[0];
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}`;
-	    fmt += '\n\n' + element[i].goal_text.replace(/['"]+/g, '');
-	    fmt += `">
+       <span style="float: right;" class="tag tag-spaced">
+          <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+          </a>
+       </span>
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}">
         ${elide(20, element[i].goal_text)}
       </span>
     </div>
+    <div id="${rule_id}" class="is-collapsible rule-inline">
+       ${element[i].goal_text}
+    </div>
 `;
+
+            vscode.postMessage({
+                command: 'highlight_inline',
+                id: rule_id,
+                value: element[i].goal_text
+            });
         }
 
         fmt += `
     </div>
+    
     <div class="panel-element panel-element-footer"></div>
 </article>
 `;
@@ -1169,17 +1320,31 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 
         for(var i = 0; i < element.length; i++) {
 
+            let rule_id = r_id + '-' + s_id + '-' + 'csta' + '-' + window.rnb++;
+
             let ds = ids_for_rt_gl(r_id, element[i].goal_id)[0];
 
             fmt += `
     <div class="panel-element">
-      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}`;
-	    fmt += '\n\n' + element[i].goal_text.replace(/['"]+/g, '');
-	    fmt += `">
+      <span style="float: right;" class="tag tag-spaced">
+         <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
+            <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+         </a>
+      </span>
+      <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}">
         ${elide(20, element[i].goal_text)}
       </span>
     </div>
+    <div id="${rule_id}" class="is-collapsible rule-inline">
+       ${element[i].goal_text}
+    </div>
 `;
+
+            vscode.postMessage({
+                command: 'highlight_inline',
+                id: rule_id,
+                value: element[i].goal_text
+            });
         }
 
         fmt += `
@@ -1239,6 +1404,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
         window.rts = [];
         window.sts = [];
         window.gls = [];
+        window.rnb = 0;
         
 // /////////////////////////////////////////////////////////////////////////////
 
@@ -1246,6 +1412,10 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
         window.goal_navigation_index = -1;
         window.current_rt = -1;
         window.current_id = -1;
+
+// /////////////////////////////////////////////////////////////////////////////
+
+        window.popCount = 0;
 
 // /////////////////////////////////////////////////////////////////////////////
 // NOTE: Here: intertweening findall cards
@@ -1525,6 +1695,72 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
                 messages: window.inbox,
                 stack: window.goal_navigation_stack,
             },
+            updated: () => {
+
+                return;
+
+                if(window.popCount == window.inboxCount)
+                    return;
+
+                for (var i = 0; i < window.inboxCount; i++, window.popCount++) {
+                    const pop = document.querySelector('#popcard-'+i);
+                    const tot = document.querySelector('#popttip-'+i);
+                    
+                    console.log('Creating popper for', i, pop, top);
+                    
+                    const popperInstance = Popper.createPopper(pop, tot, {
+                        placement: 'bottom',
+                        modifiers: [{
+                            name: 'offset',
+                            options: {
+                                offset: [0, 8],
+                            },
+                        }],
+                    });
+                    
+                    function show() {
+                        // Make the tooltip visible
+                        tot.setAttribute('data-show', '');
+                        
+                        // Enable the event listeners
+                        popperInstance.setOptions((options) => ({
+                            ...options,
+                            modifiers: [
+                                ...options.modifiers,
+                                { name: 'eventListeners', enabled: true },
+                            ],
+                        }));
+                        
+                        // Update its position
+                        popperInstance.update();
+                    }
+                    
+                    function hide() {
+                        // Hide the tooltip
+                        tot.removeAttribute('data-show');
+                        
+                        // Disable the event listeners
+                        popperInstance.setOptions((options) => ({
+                            ...options,
+                            modifiers: [
+                                ...options.modifiers,
+                                { name: 'eventListeners', enabled: false },
+                            ],
+                        }));
+                    }
+                    
+                    const showEvents = ['mouseenter', 'focus'];
+                    const hideEvents = ['mouseleave', 'blur'];
+                    
+                    showEvents.forEach((event) => {
+                        pop.addEventListener(event, show);
+                    });
+                    
+                    hideEvents.forEach((event) => {
+                        pop.addEventListener(event, hide);
+                    });
+                }
+            },
             methods: {
 
                 toggleSubCards: function(runtime_ids) {
@@ -1567,8 +1803,6 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
                     $('.card-indented').removeClass('active');
                     $('.card-indented-last').removeClass('active');
                     $('#msg-card-' + index).addClass('active');
-
-                    let totp = msg.goal_text.replace(/['"]+/g, '');
 
                     let code = `
 <div onclick="window.inboxVue.set_snippet(${index});">
@@ -1667,6 +1901,15 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
                     });
                     $("#toggle_sta").on('click', (e) => {
                         e.currentTarget.parentElement.parentElement.childNodes[3].classList.toggle('is-hidden');
+                    });
+
+                    accordions = bulmaCollapsible.attach('.is-collapsible');
+
+                    $('.no_jump_hack').click(function(e)
+                    {
+                        e.preventDefault();
+                        
+                        return false;
                     });
                 },
                 clear: function() {
@@ -1841,5 +2084,5 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     // });
 
     var quickviews = bulmaQuickview.attach();
-
+    var accordions;
 }());

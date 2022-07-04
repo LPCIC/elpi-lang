@@ -228,7 +228,6 @@ html, body
   border-radius: 50%;
   border: 2px solid #999999;
   display: inline-block;
-  float: right;
 }
 
 .dot-green
@@ -239,7 +238,6 @@ html, body
   border-radius: 50%;
   border: 2px solid #999999;
   display: inline-block;
-  float: right;
 }
 
 .dot-yellow
@@ -250,7 +248,6 @@ html, body
   border-radius: 50%;
   border: 2px solid #999999;
   display: inline-block;
-  float: right;
 }
 
 .dot-grey
@@ -261,7 +258,6 @@ html, body
   border-radius: 50%;
   border: 2px solid #999999;
   display: inline-block;
-  float: right;
 }
 
 .dot-yellowgreen
@@ -272,7 +268,6 @@ html, body
   border-radius: 50%;
   border: 2px solid #999999;
   display: inline-block;
-  float: right;
 }
 
 .dot-yellowred
@@ -283,7 +278,6 @@ html, body
   border-radius: 50%;
   border: 2px solid #999999;
   display: inline-block;
-  float: right;
 }
 
 .tag-spaced
@@ -700,3 +694,62 @@ a.dropdown-item:hover
  .pageloader .title {
    color: var(--vscode-foreground);
  }
+
+/* ****************************************************************************
+ * Inline collapsible rule rendering
+ * **************************************************************************** */
+
+#message-pane .rule-inline pre
+{
+  font-size: 1em;
+}
+
+/* ****************************************************************************
+ * 
+ * **************************************************************************** */
+
+.poptip {
+  display: inline-block;
+  background: var(--vscode-sideBar-background);
+  border-radius: 4px;
+  display: none;
+  z-index: 2048;
+}
+
+.poptip[data-show] {
+  display: block;
+}
+
+#arrow,
+#arrow::before {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+}
+
+#arrow {
+  visibility: hidden;
+}
+
+#arrow::before {
+  visibility: visible;
+  content: '';
+  transform: rotate(45deg);
+}
+
+.poptip[data-popper-placement^='top'] > #arrow {
+  bottom: -4px;
+}
+
+.poptip[data-popper-placement^='bottom'] > #arrow {
+  top: -4px;
+}
+
+.poptip[data-popper-placement^='left'] > #arrow {
+  right: -4px;
+}
+
+.poptip[data-popper-placement^='right'] > #arrow {
+  left: -4px;
+}
