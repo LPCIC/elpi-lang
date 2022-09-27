@@ -2033,7 +2033,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     // Filtering
     // /////////////////////////////////////////////////////////////////////////////
 
-    $("#filter").on("input", function() {
+    $("#filter").on("change", function() { // use the "input" event for filtering on each keystroke instead
         filter($(this).val());
     });
     
