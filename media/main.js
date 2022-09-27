@@ -95,9 +95,9 @@
         return ids;
     }
 
-    function ids_for_rt_gl_not(rt, gl, st) {
+    function ids_for_rt_gl_not(rt, gl, id) {
 
-        // console.log('ids_for_rt_gl_not', rt, gl, st);
+        // console.log('ids_for_rt_gl_not', rt, gl, id);
 
         let rt_ids = ids_for_rt(rt);
         let gl_ids = ids_for_gl(gl);
@@ -110,7 +110,7 @@
         let ids = [];
 
         for(var i = 0; i < it_ids.length; i++)
-            if (it_ids[i] !== st)
+            if (it_ids[i] !== id)
                 ids.push(it_ids[i]);
 
         return ids;
@@ -617,7 +617,7 @@ ${step.value.findall_solution_text}
     <div class="panel-element">
        <span style="float: right;" class="tag tag-spaced">
           <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+             <span class="mdi mdi-lambda" aria-hidden="true"></span>
           </a>
       </span>
       <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value.suspend_sibling.goal_id} - - (${window.inbox[ds].rt}, ${window.inbox[ds].id})">
@@ -671,7 +671,7 @@ ${step.value.findall_solution_text}
     <div class="panel-element">
       <span style="float: right;" class="tag tag-spaced">
           <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+             <span class="mdi mdi-lambda" aria-hidden="true"></span>
           </a>
       </span>
       <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value[i].goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})">
@@ -1017,7 +1017,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
 
         fmt += `<span style="float: right;" class="tag tag-spaced">
                    <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-                      <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+                      <span class="mdi mdi-lambda" aria-hidden="true"></span>
                    </a>
                 </span>`
 
@@ -1060,7 +1060,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                        <span style="float: right;" class="tag">Event</span>
                        <span style="float: right;" class="tag tag-spaced">
                           <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-                             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+                             <span class="mdi mdi-lambda" aria-hidden="true"></span>
                           </a>
                        </span>
                        <span style="float: left; margin-right: 10px;" class="tag">
@@ -1086,7 +1086,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
 
     function format_siblings(element, r_id, s_id) // TODO: HERE - Assuming that
     {
-        // console.log('Formating sibling', JSON.stringify(element));
+        console.log('Formating sibling', JSON.stringify(element));
 
         let fmt = "";
 
@@ -1096,11 +1096,16 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
             // console.log('2', window.inbox[window.goal_to_index.get(element[i].goal_id)]);
 
             let rule_id = r_id + '-' + s_id + '-' + 'sib' + '-' + window.rnb++;
+            let  own_id = ids_for_rt_st(r_id, s_id);
 
-            let idxes = ids_for_rt_gl_not(r_id, element[i].goal_id, s_id); // window.goal_to_index.get(element[i].goal_id)
+            let idxes = ids_for_rt_gl_not(r_id, element[i].goal_id, own_id); // window.goal_to_index.get(element[i].goal_id)
+
+            // console.log('3', idxes, r_id, element[i].goal_id, s_id);
 
             let index = idxes[0];
             let entry = index == undefined ? undefined : window.inbox[index];
+
+            // console.log('4', entry);
 
             let ds = ids_for_rt_gl(r_id, element[i].goal_id)[0];
 
@@ -1113,7 +1118,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                           <span class="tag tag-${status}" style="float: right;">Sibling</span>
                           <span style="float: right;" class="tag tag-spaced">
                              <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-                                <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+                                <span class="mdi mdi-lambda" aria-hidden="true"></span>
                              </a>
                           </span>
                           <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}">
@@ -1124,11 +1129,12 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                            ${element[i].goal_text}
                         </div>`;
             } else {
+
                 fmt += `<div class="panel-element">
                           <span class="tag" style="float: right;">Sibling</span>
                           <span style="float: right;" class="tag tag-spaced">
                              <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-                                <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+                                <span class="mdi mdi-lambda" aria-hidden="true"></span>
                              </a>
                           </span>
                           <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}">
@@ -1175,7 +1181,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     </span>
     <span style="float: right;" class="tag tag-spaced">
     <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-       <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+       <span class="mdi mdi-lambda" aria-hidden="true"></span>
     </a>
 </span>
 `;
@@ -1229,7 +1235,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     <div class="panel-element">
        <span style="float: right;" class="tag tag-spaced">
           <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+             <span class="mdi mdi-lambda" aria-hidden="true"></span>
           </a>
       </span>
       <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element.chr_new_goals[i].goal_id}">
@@ -1275,7 +1281,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     <div class="panel-element">
        <span style="float: right;" class="tag tag-spaced">
           <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-             <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+             <span class="mdi mdi-lambda" aria-hidden="true"></span>
           </a>
        </span>
       <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}">
@@ -1328,7 +1334,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     <div class="panel-element">
       <span style="float: right;" class="tag tag-spaced">
          <a href="#${rule_id}" data-action="collapse" class="no_jump_hack">
-            <span class="mdi mdi-code-parentheses" aria-hidden="true"></span>
+            <span class="mdi mdi-lambda" aria-hidden="true"></span>
          </a>
       </span>
       <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${element[i].goal_id}">
