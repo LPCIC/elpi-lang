@@ -171,7 +171,7 @@
 	},
 	"scripts": {
 		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json",
-		"vscode:prepublish": "npm run compile",
+		"vscode:prepublish": "npm run compile && rm -rf node_modules/shiki/languages/*",
 		"compile": "tsc -p ./",
 		
 		"lint": "eslint . --ext .ts,.tsx",
