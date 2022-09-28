@@ -1,17 +1,29 @@
 # elpi-lang
 
-This extension provides some basic support for the [Elpi](https://github.com/LPCIC/elpi)
-programming language to Visual Studio Code.
+This extension provides support for the [Elpi](https://github.com/LPCIC/elpi) programming language to Visual Studio Code.
+
+![screenshot](assets/elpi-tracer.png)
 
 ## Features
 
 - Basic syntax highlighting
-
-  ![screenshot](images/screenshot.png)
+- Trace visualisation and navigation
 
 ## Requirements
 
-- none
+- Node 1.16+
+- VSCode 1.49+
+- Elpi 1.16+
+
+## Building for development
+
+- `npm install`
+
+## Running in development
+
+- Open the source tree root in VS Code 1.49+
+- Go to the extension panel in activity bar
+- Click 'Run extension'
 
 ## Extension Settings
 
@@ -23,6 +35,11 @@ programming language to Visual Studio Code.
 
 ## Release Notes
 
+### 0.2.0
+
+- Adds trace visualisation
+
 ### 0.0.1
 
-First public release
+- First public release
+- Syntax highlighting

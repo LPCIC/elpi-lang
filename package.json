@@ -3,7 +3,7 @@
 	"displayName": "Elpi lang",
 	"publisher": "gares",
 	"description": "Syntax highlighting for Elpi",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"homepage": "https://github.com/LPCIC/elpi-lang",
 	"repository": {
 		"type": "git",
@@ -15,12 +15,89 @@
 	],
 	"license": "MIT",
 	"engines": {
-		"vscode": "^1.33.0"
+		"vscode": "^1.50.0"
 	},
+	"extensionKind": [
+		"ui",
+		"workspace"
+	],
 	"categories": [
 		"Programming Languages"
 	],
+	"activationEvents": [
+		"onView:elpi.tracer",
+		"onCommand:elpi.trace",
+		"onCommand:elpi.clear",
+		"onCommand:elpi.watch_start",
+		"onCommand:elpi.watch_stop"
+	],
+	"main": "./out/extension.js",
 	"contributes": {
+		"commands": [
+			{
+				"command": "elpi.open",
+				"category": "Elpi Tracer",
+				"title": "Open",
+				"icon": "$(file-add)"
+			},
+			{
+				"command": "elpi.save",
+				"category": "Elpi Tracer",
+				"title": "Save",
+				"icon": "$(save)"
+			},
+			{
+				"command": "elpi.trace",
+				"category": "Elpi Tracer",
+				"title": "Trace",
+				"icon": "$(debug-console)"
+			},
+			{
+				"command": "elpi.watch_start",
+				"category": "Elpi Tracer",
+				"title": "Start watching",
+				"icon": "$(debug-alt)"
+			},
+			{
+				"command": "elpi.watch_stop",
+				"category": "Elpi Tracer",
+				"title": "Stop watching",
+				"icon": "$(stop)"
+			},
+			{
+				"command": "elpi.clear",
+				"category": "Elpi Tracer",
+				"title": "Clear",
+				"icon": "$(debug-console-clear-all)"
+			}
+		],
+		"configuration": {
+			"title": "Elpi",
+			"properties": {
+				"elpi.elpi.options": {
+					"type": "string",
+					"default": "-no-tc -trace-on json [OUTPUT] -trace-at run 0 999 -trace-only user",
+					"markdownDescription": "Command line arguments"
+				},
+				"elpi.elpi.path": {
+					"type": "string",
+					"default": "elpi",
+					"markdownDescription": "Path to `elpi` binary (or elpi from `$PATH`)"
+				},
+				"elpi.elpi_trace_elaborator.path": {
+					"type": "string",
+					"default": "elpi-trace-elaborator",
+					"markdownDescription": "Path to `elpi-trace-elaborator` (or elpi from `$PATH`)"
+				}
+			}
+		},
+		"grammars": [
+			{
+				"language": "elpi",
+				"scopeName": "source.elpi",
+				"path": "./syntaxes/elpi.tmLanguage.json"
+			}
+		],
 		"languages": [
 			{
 				"id": "elpi",
@@ -34,24 +111,84 @@
 				"configuration": "./elpi-configuration.json"
 			}
 		],
-		"grammars": [
-			{
-				"language": "elpi",
-				"scopeName": "source.elpi",
-				"path": "./syntaxes/elpi.tmLanguage.json"
-			}
-		]
+		"menus": {
+			"view/title": [
+				{
+					"command": "elpi.open",
+					"group": "navigation@0",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.save",
+					"group": "navigation@1",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.trace",
+					"group": "navigation@2",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.clear",
+					"group": "navigation@3",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.watch_start",
+					"group": "navigation@4",
+					"when": "view == elpi.tracer"
+				},
+				{
+					"command": "elpi.watch_stop",
+					"group": "navigation@5",
+					"when": "view == elpi.tracer"
+				}
+			]
+		},
+		"views": {
+			"elpi-tracer": [
+				{
+					"type": "webview",
+					"id": "elpi.tracer",
+					"name": "Elpi Tracer"
+				}
+			]
+		},
+		"viewsContainers": {
+			"panel": [
+				{
+					"id": "elpi-tracer",
+					"title": "Elpi Tracer",
+					"icon": "media/panel.svg"
+				}
+			]
+		}
 	},
 	"__metadata": {
 		"id": "040542ac-8f59-4e38-95f9-463f42c78f77",
 		"publisherDisplayName": "Enrico Tassi",
 		"publisherId": "a31c90d1-39d0-4553-b020-dd47cff7daf8"
 	},
-	"dependencies": {},
-	"devDependencies": {
-		"mustache": "^4.0.1"
-	},
 	"scripts": {
-		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json"
+		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json",
+		"vscode:prepublish": "npm run compile && rm -rf node_modules/shiki/languages/*",
+		"compile": "tsc -p ./",
+		
+		"lint": "eslint . --ext .ts,.tsx",
+		"watch": "tsc -w -p ./"
+	},
+	"devDependencies": {
+		"@types/node": "^17.0.35",
+		"@types/vscode": "^1.50.0",
+		"@typescript-eslint/eslint-plugin": "^5.19.0",
+		"@typescript-eslint/parser": "^5.19.0",
+		"child-process": "^1.0.2",
+		"eslint": "^8.13.0",
+		"mustache": "^4.0.1",
+		"typescript": "^4.6.3"
+	},
+	"dependencies": {
+		"chokidar": "^3.5.3",
+		"shiki": "^0.10.1"
 	}
 }
