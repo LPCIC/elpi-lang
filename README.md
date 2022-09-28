@@ -2,6 +2,8 @@
 
 This extension provides support for the [Elpi](https://github.com/LPCIC/elpi) programming language to Visual Studio Code.
 
+![screenshot](assets/elpi-tracer.png)
+
 ## Features
 
 - Basic syntax highlighting
@@ -41,11 +43,3 @@ This extension provides support for the [Elpi](https://github.com/LPCIC/elpi) pr
 
 - First public release
 - Syntax highlighting
-
-## References
-
-- [VSCode Extensions](https://code.visualstudio.com/api)
-- [VSCode Extensions - WebViews](https://code.visualstudio.com/api/extension-guides/webview)
-- [VSCode Theme Color](https://code.visualstudio.com/api/references/theme-color)
-- [VSCode Product Icons](https://code.visualstudio.com/api/references/icons-in-labels)
-- [VSCode API](https://code.visualstudio.com/api/references/vscode-api)
