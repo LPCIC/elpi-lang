@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.2.1
+
+- Make the highlighting optional when browsing the trace
+
 ### 0.2.0
 
 - trace browser

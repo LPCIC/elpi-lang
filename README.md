@@ -35,6 +35,10 @@ This extension provides support for the [Elpi](https://github.com/LPCIC/elpi) pr
 
 ## Release Notes
 
+### 0.2.1
+
+- Make the highlighting optional when browsing the trace
+
 ### 0.2.0
 
 - Adds trace visualisation

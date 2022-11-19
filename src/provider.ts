@@ -262,8 +262,10 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
                 this._source = fileUri[0].fsPath;
 
+                let enable_highlighting = configuration.elpi_trace_view.syntax_highlighting;
+
                 if (this._view)
-                    this._view.webview.postMessage({ type: 'trace', trace: trace, file: fileUri[0].fsPath });
+                    this._view.webview.postMessage({ type: 'trace', trace: trace, file: fileUri[0].fsPath, enable_highlighting: enable_highlighting });
                 
                 if (this._view)
                     this._view.webview.postMessage({ type: 'progress', state: 'off' });
@@ -310,6 +312,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             this._elpi                  = configuration.elpi.path;
             this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
+            let enable_highlighting = configuration.elpi_trace_view.syntax_highlighting;
+
             message = `File ${path} has been changed`;
 
             vscode.window.showInformationMessage(message);
@@ -322,7 +326,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             this._source = this._watcher_target;
 
             if (this._view)
-                this._view.webview.postMessage({ type: 'trace', trace: trace, file: 'Watched' });
+                this._view.webview.postMessage({ type: 'trace', trace: trace, file: 'Watched', enable_highlighting: enable_highlighting });
         });
 
         message = "Me watch has started. Try me by touching " + this._watcher_target;
@@ -360,6 +364,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
         this._options_default = configuration.elpi.options;
+
+        let enable_highlighting = configuration.elpi_trace_view.syntax_highlighting;
 
         if(vscode.window.activeTextEditor == undefined)
             return;
@@ -402,7 +408,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         // --- Send message to the view backend
 
         if (this._view)
-            this._view.webview.postMessage({ type: 'trace', trace: trace, file: current_file });
+            this._view.webview.postMessage({ type: 'trace', trace: trace, file: current_file, enable_highlighting: enable_highlighting });
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
@@ -550,14 +556,10 @@ return `<!DOCTYPE html>
                         <div class="card-content">
                             <div class="msg-header">
                                 <span v-bind:id="'popcard-'+index" v-html="step.goal_text_highlighted_elided" aria-describedby="tooltip"></span>
-    
-    <div class="poptip" v-bind:id="'popttip-'+index" role="tooltip">
-      
-
-      <div v-html="step.goal_text_highlighted"></div>
-      <div id="arrow" data-popper-arrow></div>
-    </div>
-
+                                <div class="poptip" v-bind:id="'popttip-'+index" role="tooltip">
+                                <div v-html="step.goal_text_highlighted"></div>
+                                <div id="arrow" data-popper-arrow></div>
+                                </div>
                                 <span class="msg-timestamp"></span>
                                 <span class="msg-attachment tag"><small>{{ step.goal_id }} - ({{step.rt}}|{{ step.id }})</small></span>
                             </div>
