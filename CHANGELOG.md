@@ -1,5 +1,11 @@
 # Change Log
 
+### 0.2.2
+
+- Fallback to npm for all dependencies
+- Use minified assets exclusively
+- Introspect presence of required binaries in PATH
+
 ### 0.2.1
 
 - Make the highlighting optional when browsing the trace
