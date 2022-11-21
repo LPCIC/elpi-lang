@@ -945,10 +945,6 @@ ${step.value.findall_solution_text}
             // console.log('format_stack:', 'it_ids', '[' + it_ids.join(', ') + ']');
 
             fmt += format_rule(element[i].rule, rr_id, rs_id, window.gls[it_ids[0]]);
-
-            // TODO: Display the destination card HERE as a tooltip
-            //
-            // ... Maybe using jquery tooltip ...
         }
 
         fmt += `
@@ -1088,7 +1084,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
 
     function format_siblings(element, r_id, s_id) // TODO: HERE - Assuming that
     {
-        console.log('Formating sibling', JSON.stringify(element));
+        // console.log('Formatting sibling', JSON.stringify(element));
 
         let fmt = "";
 
@@ -1715,69 +1711,69 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
             },
             updated: () => {
 
-                return;
+                // return;
 
-                if(window.popCount == window.inboxCount)
-                    return;
+                // if(window.popCount == window.inboxCount)
+                //     return;
 
-                for (var i = 0; i < window.inboxCount; i++, window.popCount++) {
-                    const pop = document.querySelector('#popcard-'+i);
-                    const tot = document.querySelector('#popttip-'+i);
+                // for (var i = 0; i < window.inboxCount; i++, window.popCount++) {
+                //     const pop = document.querySelector('#popcard-'+i);
+                //     const tot = document.querySelector('#popttip-'+i);
                     
-                    console.log('Creating popper for', i, pop, top);
+                //     console.log('Creating popper for', i, pop, top);
                     
-                    const popperInstance = Popper.createPopper(pop, tot, {
-                        placement: 'bottom',
-                        modifiers: [{
-                            name: 'offset',
-                            options: {
-                                offset: [0, 8],
-                            },
-                        }],
-                    });
+                //     const popperInstance = Popper.createPopper(pop, tot, {
+                //         placement: 'bottom',
+                //         modifiers: [{
+                //             name: 'offset',
+                //             options: {
+                //                 offset: [0, 8],
+                //             },
+                //         }],
+                //     });
                     
-                    function show() {
-                        // Make the tooltip visible
-                        tot.setAttribute('data-show', '');
+                //     function show() {
+                //         // Make the tooltip visible
+                //         tot.setAttribute('data-show', '');
                         
-                        // Enable the event listeners
-                        popperInstance.setOptions((options) => ({
-                            ...options,
-                            modifiers: [
-                                ...options.modifiers,
-                                { name: 'eventListeners', enabled: true },
-                            ],
-                        }));
+                //         // Enable the event listeners
+                //         popperInstance.setOptions((options) => ({
+                //             ...options,
+                //             modifiers: [
+                //                 ...options.modifiers,
+                //                 { name: 'eventListeners', enabled: true },
+                //             ],
+                //         }));
                         
-                        // Update its position
-                        popperInstance.update();
-                    }
+                //         // Update its position
+                //         popperInstance.update();
+                //     }
                     
-                    function hide() {
-                        // Hide the tooltip
-                        tot.removeAttribute('data-show');
+                //     function hide() {
+                //         // Hide the tooltip
+                //         tot.removeAttribute('data-show');
                         
-                        // Disable the event listeners
-                        popperInstance.setOptions((options) => ({
-                            ...options,
-                            modifiers: [
-                                ...options.modifiers,
-                                { name: 'eventListeners', enabled: false },
-                            ],
-                        }));
-                    }
+                //         // Disable the event listeners
+                //         popperInstance.setOptions((options) => ({
+                //             ...options,
+                //             modifiers: [
+                //                 ...options.modifiers,
+                //                 { name: 'eventListeners', enabled: false },
+                //             ],
+                //         }));
+                //     }
                     
-                    const showEvents = ['mouseenter', 'focus'];
-                    const hideEvents = ['mouseleave', 'blur'];
+                //     const showEvents = ['mouseenter', 'focus'];
+                //     const hideEvents = ['mouseleave', 'blur'];
                     
-                    showEvents.forEach((event) => {
-                        pop.addEventListener(event, show);
-                    });
+                //     showEvents.forEach((event) => {
+                //         pop.addEventListener(event, show);
+                //     });
                     
-                    hideEvents.forEach((event) => {
-                        pop.addEventListener(event, hide);
-                    });
-                }
+                //     hideEvents.forEach((event) => {
+                //         pop.addEventListener(event, hide);
+                //     });
+                // }
             },
             methods: {
 

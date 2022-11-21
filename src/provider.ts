@@ -251,6 +251,11 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         
                 this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
+				if(!fs.existsSync(this._elpi_trace_elaborator.replace('$HOME', os.homedir()))) {
+					vscode.window.showInformationMessage(`Failed to find elpi trace elaborator`);
+					return;
+				}
+
                 this._channel.appendLine("Opening raw trace: " + fileUri[0].fsPath);
 
                 if (this._view)
@@ -312,6 +317,16 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             this._elpi                  = configuration.elpi.path;
             this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
+			if(!fs.existsSync(this._elpi.replace('$HOME', os.homedir()))) {
+				vscode.window.showInformationMessage(`Failed to find elpi`);
+				return;
+			}
+
+			if(!fs.existsSync(this._elpi_trace_elaborator.replace('$HOME', os.homedir()))) {
+				vscode.window.showInformationMessage(`Failed to find elpi trace elaborator`);
+				return;
+			}
+
             let enable_highlighting = configuration.elpi_trace_view.syntax_highlighting;
 
             message = `File ${path} has been changed`;
@@ -363,6 +378,16 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         this._elpi                  = configuration.elpi.path;
         this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
+		if(!fs.existsSync(this._elpi.replace('$HOME', os.homedir()))) {
+			vscode.window.showInformationMessage(`Failed to find elpi`);
+			return;
+		}
+
+		if(!fs.existsSync(this._elpi_trace_elaborator.replace('$HOME', os.homedir()))) {
+			vscode.window.showInformationMessage(`Failed to find elpi trace elaborator`);
+			return;
+		}
+
         this._options_default = configuration.elpi.options;
 
         let enable_highlighting = configuration.elpi_trace_view.syntax_highlighting;
@@ -413,23 +438,22 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
     private _getHtmlForWebview(webview: vscode.Webview) {
 
-        const      jqueryUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'jquery-3.6.0.js'));
-        const         vueUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vue.js'));
-        const        fuzzUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'fuzzball.umd.min.js'));
-        const     bulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-quickview.js'));
-        const     bulmaACUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-collapsible.min.js'));
-        const      popperUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'popper.min.js'));
+        const      jqueryUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'jquery', 'dist', 'jquery.min.js'));
+        const         vueUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'vue', 'dist', 'vue.min.js'));
+        const        fuzzUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'fuzzball', 'dist', 'fuzzball.umd.min.js'));
+        const     bulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'bulma-quickview', 'dist', 'js', 'bulma-quickview.min.js'));
+        const     bulmaACUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@creativebulma', 'bulma-collapsible', 'dist', 'js', 'bulma-collapsible.min.js'));
         const      scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
 
         const    styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
         const   styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
-        const    styleBulmaUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma.css'));
-        const  styleBulmaDVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-divider.css'));
-        const  styleBulmaTTUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-tooltip.css'));
-        const  styleBulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-quickview.min.css'));
-        const  styleBulmaPLUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-pageloader.min.css'));
-        const  styleBulmaACUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'bulma-collapsible.min.css'));
-        const      styleMDIUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'materialdesignicons.css'));
+        const    styleBulmaUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'bulma', 'css', 'bulma.min.css'));
+        const  styleBulmaDVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'bulma-divider', 'dist', 'css', 'bulma-divider.min.css'));
+        const  styleBulmaTTUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'bulma-tooltip', 'dist', 'css', 'bulma-tooltip.min.css'));
+        const  styleBulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'bulma-quickview', 'dist', 'css', 'bulma-quickview.min.css'));
+        const  styleBulmaPLUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'bulma-pageloader', 'dist', 'css', 'bulma-pageloader.min.css'));
+        const  styleBulmaACUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@creativebulma', 'bulma-collapsible', 'dist', 'css', 'bulma-collapsible.min.css'));
+        const      styleMDIUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@mdi', 'font', 'css', 'materialdesignicons.min.css'));
         const     styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css'));
 
 return `<!DOCTYPE html>
@@ -556,10 +580,10 @@ return `<!DOCTYPE html>
                         <div class="card-content">
                             <div class="msg-header">
                                 <span v-bind:id="'popcard-'+index" v-html="step.goal_text_highlighted_elided" aria-describedby="tooltip"></span>
-                                <div class="poptip" v-bind:id="'popttip-'+index" role="tooltip">
-                                <div v-html="step.goal_text_highlighted"></div>
-                                <div id="arrow" data-popper-arrow></div>
-                                </div>
+                        <!--    <div class="poptip" v-bind:id="'popttip-'+index" role="tooltip"> -->
+                        <!--    <div v-html="step.goal_text_highlighted"></div> -->
+                        <!--    <div id="arrow" data-popper-arrow></div> -->
+                        <!--    </div> -->
                                 <span class="msg-timestamp"></span>
                                 <span class="msg-attachment tag"><small>{{ step.goal_id }} - ({{step.rt}}|{{ step.id }})</small></span>
                             </div>
@@ -638,6 +662,9 @@ return `<!DOCTYPE html>
                        <div class="card_content"></div>
                    </div>
                 </div>
+
+				<br/>
+				<br/>
             </div>
         </div>
 
@@ -667,7 +694,6 @@ return `<!DOCTYPE html>
         <script src="${fuzzUri}"></script>
         <script src="${bulmaQVUri}"></script>
         <script src="${bulmaACUri}"></script>
-        <script src="${popperUri}"></script>
         <script src="${scriptUri}"></script>
     </body>
 </html>`;
