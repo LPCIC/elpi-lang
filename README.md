@@ -35,6 +35,11 @@ This extension provides support for the [Elpi](https://github.com/LPCIC/elpi) pr
 
 ## Release Notes
 
+### 0.2.3
+
+- Better notifications
+- Better scrolling when jumping from a card to another
+
 ### 0.2.2
 
 - Fallback to npm for all dependencies

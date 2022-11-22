@@ -255,7 +255,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 					vscode.window
 					  .showInformationMessage(`Failed to find elpi trace elaborator`, 'Go to settings')
 					  .then(action => {
-						vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
+						if (action == 'Go to settings')
+							vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
 					});
 					return;
 				}
@@ -325,7 +326,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 				vscode.window
 				  .showInformationMessage(`Failed to find elpi`, 'Go to settings')
 				  .then(action => {
-					vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
+					if (action == 'Go to settings')
+						vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
 				});
 				return;
 			}
@@ -334,7 +336,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 				vscode.window
 				  .showInformationMessage(`Failed to find elpi trace elaborator`, 'Go to settings')
 				  .then(action => {
-					vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
+					if (action == 'Go to settings')
+						vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
 				});
 				return;
 			}
@@ -344,7 +347,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             message = `File ${path} has been changed`;
 
             vscode.window.showInformationMessage(message);
-			
+
             this._channel.appendLine(message);
 
             this.exec("eval $(opam env) && cat " + this._watcher_target + " | " + this._elpi_trace_elaborator + " > " + this._watcher_target_elaborated);
@@ -395,7 +398,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 			vscode.window
 			  .showInformationMessage(`Failed to find elpi`, 'Go to settings')
 			  .then(action => {
-				vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
+				if (action == 'Go to settings')
+					vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
 			});
 			return;
 		}
@@ -404,7 +408,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 			vscode.window
 			  .showInformationMessage(`Failed to find elpi trace elaborator`, 'Go to settings')
 			  .then(action => {
-			    vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
+			    if (action == 'Go to settings')
+					vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
 		    });
 			return;
 		}
