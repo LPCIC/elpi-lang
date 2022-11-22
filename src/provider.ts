@@ -582,7 +582,7 @@ return `<!DOCTYPE html>
                 <p>Navigation history:</p>
 
                 <ul>
-                    <li v-for="(step, index) in stack" v-bind:id="'bd-goal-'+index" :class="step.active" v-on:click="switchTo(index)">
+                    <li v-for="(step, index) in stack" v-bind:id="'bd-goal-'+index" :class="step.active" v-on:click="switchTo(index, step.rt, step.id)">
                         <a><span class="mdi mdi-card-bulleted"></span>({{ step.rt }}, {{ step.id }})</a>
                     </li>
                 </ul>

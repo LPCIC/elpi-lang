@@ -457,9 +457,7 @@
 
     function scrollTo(index) {
 
-        $("#message-feed").animate({
-            scrollTop: $("#msg-card-" + index).offset().top - 40 // -40 is header height, me css fu sucks
-        }, 500);
+		document.getElementById("msg-card-" + index).scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     // /////////////////////////////////////////////////////////////////////////////
@@ -2004,10 +2002,8 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
                     //     });
                     // }
                 },
-                switchTo: function(index) {
+                switchTo: function(index, runtime, step) {
 
-                    // console.log('Switching to', index);
-                    
                     $("#filter").val(''); filter('');
 
                     window.goal_navigation_index = index;
@@ -2019,7 +2015,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 
                     window.inboxVue.showMessage(destination.msg, destination.index);
 
-                    scrollTo(index);
+                    scrollTo(ids_for_rt_st(runtime, step)[0]);
 
                     window.prevent_nav_handling = false;
                 }
