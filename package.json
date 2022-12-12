@@ -179,13 +179,15 @@
 		"vscode:prepublish": "npm run compile && rm -rf node_modules/shiki/languages/*",
 		"compile": "tsc -p ./",
 		"lint": "eslint . --ext .ts,.tsx",
-		"watch": "tsc -w -p ./"
+		"watch": "tsc -w -p ./",
+		"deploy": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/node": "^17.0.35",
 		"@types/vscode": "^1.50.0",
 		"@typescript-eslint/eslint-plugin": "^5.19.0",
 		"@typescript-eslint/parser": "^5.19.0",
+		"@vscode/vsce": "^2.15.0",
 		"child-process": "^1.0.2",
 		"eslint": "^8.13.0",
 		"mustache": "^4.0.1",

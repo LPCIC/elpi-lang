@@ -1,0 +1,31 @@
+name: Visual Studio store upload
+
+on:
+  release:
+    types: [published]
+    
+jobs:
+  build:
+
+    strategy:
+      matrix:
+        os: ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+
+    - run: npm install
+
+    - name: Publish
+      if: success() && startsWith(github.ref, 'refs/tags/')
+      run: npm run deploy
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_PAT }}
