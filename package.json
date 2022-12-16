@@ -3,7 +3,7 @@
 	"displayName": "Elpi lang",
 	"publisher": "gares",
 	"description": "Syntax highlighting for Elpi",
-	"version": "0.2.0",
+	"version": "0.2.3",
 	"homepage": "https://github.com/LPCIC/elpi-lang",
 	"repository": {
 		"type": "git",
@@ -88,6 +88,11 @@
 					"type": "string",
 					"default": "elpi-trace-elaborator",
 					"markdownDescription": "Path to `elpi-trace-elaborator` (or elpi from `$PATH`)"
+				},
+				"elpi.elpi_trace_view.syntax_highlighting": {
+					"type": "boolean",
+					"default": "true",
+					"markdownDescription": "Highlight elpi code statements"
 				}
 			}
 		},
@@ -173,22 +178,33 @@
 		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json",
 		"vscode:prepublish": "npm run compile && rm -rf node_modules/shiki/languages/*",
 		"compile": "tsc -p ./",
-		
 		"lint": "eslint . --ext .ts,.tsx",
-		"watch": "tsc -w -p ./"
+		"watch": "tsc -w -p ./",
+		"deploy": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/node": "^17.0.35",
 		"@types/vscode": "^1.50.0",
 		"@typescript-eslint/eslint-plugin": "^5.19.0",
 		"@typescript-eslint/parser": "^5.19.0",
+		"@vscode/vsce": "^2.15.0",
 		"child-process": "^1.0.2",
 		"eslint": "^8.13.0",
 		"mustache": "^4.0.1",
 		"typescript": "^4.6.3"
 	},
 	"dependencies": {
+		"@creativebulma/bulma-collapsible": "^1.0.4",
+		"@mdi/font": "^7.0.96",
+		"bulma": "^0.9.4",
+		"bulma-divider": "^0.2.0",
+		"bulma-pageloader": "^0.3.0",
+		"bulma-quickview": "^2.0.0",
+		"bulma-tooltip": "^3.0.2",
 		"chokidar": "^3.5.3",
-		"shiki": "^0.10.1"
+		"fuzzball": "^2.1.2",
+		"jquery": "^3.6.1",
+		"shiki": "^0.10.1",
+		"vue": "^2.5.16"
 	}
 }

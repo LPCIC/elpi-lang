@@ -22,7 +22,7 @@
                 break;
             case 'trace':
                 clear();
-                trace(message.trace);
+                trace(message.trace, message.enable_highlighting);
                 $("#trace-information").val(message.file + ' on ' + new Date().toISOString());
                 break;
             case 'clear':
@@ -457,9 +457,7 @@
 
     function scrollTo(index) {
 
-        $("#message-feed").animate({
-            scrollTop: $("#msg-card-" + index).offset().top - 40 // -40 is header height, me css fu sucks
-        }, 500);
+		document.getElementById("msg-card-" + index).scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     // /////////////////////////////////////////////////////////////////////////////
@@ -625,7 +623,7 @@ ${step.value.findall_solution_text}
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-       ${step.value.suspend_sibling.goal_text}
+        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${step.value.suspend_sibling.goal_text}</span></span></pre>
     </div>
   </div>
   <div class="panel-element panel-element-footer"></div>
@@ -633,11 +631,12 @@ ${step.value.findall_solution_text}
 <br/>
 `;
 
-        vscode.postMessage({
-            command: 'highlight_inline',
-            id: rule_id,
-            value: step.value.suspend_sibling.goal_text
-        });
+        if(window.enable_highlighting)
+            vscode.postMessage({
+                command: 'highlight_inline',
+                id: rule_id,
+                value: step.value.suspend_sibling.goal_text
+            });
 
         contents += format_stack(step.value.suspend_stack, r_id, s_id);
 
@@ -679,16 +678,15 @@ ${step.value.findall_solution_text}
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-       ${step.value[i].goal_text}
+        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${step.value[i].goal_text}</span></span></pre>
     </div>
 `;
 
-            vscode.postMessage({
+        if(window.enable_highlighting) vscode.postMessage({
                 command: 'highlight_inline',
                 id: rule_id,
                 value: step.value[i].goal_text
             });
-
         }
 
       contents += `
@@ -945,10 +943,6 @@ ${step.value.findall_solution_text}
             // console.log('format_stack:', 'it_ids', '[' + it_ids.join(', ') + ']');
 
             fmt += format_rule(element[i].rule, rr_id, rs_id, window.gls[it_ids[0]]);
-
-            // TODO: Display the destination card HERE as a tooltip
-            //
-            // ... Maybe using jquery tooltip ...
         }
 
         fmt += `
@@ -974,6 +968,8 @@ ${step.value.findall_solution_text}
 
         if (rule_type == "BuiltinRule")
             rule_text = element.value.kind + ' - ' + element.value.value;
+        
+        // rule_text = rule_text.trim();
 
         let fmt = `
 <div class="panel-element">
@@ -1034,15 +1030,15 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
 
 </div>
 <div id="${rule_id}" class="is-collapsible rule-inline">
-   ${rule_text}
+    <pre class="shiki" style="background-color: var(--shiki-color-background)"><span style="color: var(--shiki-color-text)">${rule_text}</span></pre>
 </div>`;
 
-        vscode.postMessage({
+        if(window.enable_highlighting) vscode.postMessage({
             command: 'highlight_inline',
             id: rule_id,
             value: rule_text
         });
-
+        
         return fmt;
     }
 
@@ -1071,10 +1067,10 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                        </span>
                     </div>
                     <div id="${rule_id}" class="is-collapsible rule-inline">
-                       ${element[i].value}
+                        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].value}</span></span></pre>
                     </div>`;
         
-            vscode.postMessage({
+            if(window.enable_highlighting) vscode.postMessage({
                 command: 'highlight_inline',
                 id: rule_id,
                 value: element[i].value
@@ -1086,7 +1082,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
 
     function format_siblings(element, r_id, s_id) // TODO: HERE - Assuming that
     {
-        console.log('Formating sibling', JSON.stringify(element));
+        // console.log('Formatting sibling', JSON.stringify(element));
 
         let fmt = "";
 
@@ -1126,7 +1122,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                           </span>
                         </div>
                         <div id="${rule_id}" class="is-collapsible rule-inline">
-                           ${element[i].goal_text}
+                            <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].goal_text}</span></span></pre>
                         </div>`;
             } else {
 
@@ -1142,15 +1138,15 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                           </span>
                         </div>
                         <div id="${rule_id}" class="is-collapsible rule-inline">
-                           ${element[i].goal_text}
+                            <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].goal_text}</span></span></pre>
                         </div>`;
             }
 
-            vscode.postMessage({
+            if(window.enable_highlighting) vscode.postMessage({
                 command: 'highlight_inline',
                 id: rule_id,
                 value: element[i].goal_text
-            });
+            });    
         }
 
         return fmt;
@@ -1190,15 +1186,15 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     <span>${elide(20, attempt_text)}</span>
 </div>
 <div id="${rule_id}" class="is-collapsible rule-inline">
-   ${attempt_text}
+    <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${attempt_text}</span></span></pre>
 </div>`;
 
-        vscode.postMessage({
-            command: 'highlight_inline',
-            id: rule_id,
-            value: attempt_text
-        });
-
+        if(window.enable_highlighting) vscode.postMessage({
+                command: 'highlight_inline',
+                id: rule_id,
+                value: attempt_text
+            });
+        
         return fmt;
     }
 
@@ -1243,15 +1239,16 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-       ${element.chr_new_goals[i].goal_text}
+        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element.chr_new_goals[i].goal_text}</span></span></pre>
     </div>
 `;
 
-            vscode.postMessage({
-                command: 'highlight_inline',
-                id: rule_id,
-                value: element.chr_new_goals[i].goal_text
-            });
+            if(window.enable_highlighting)
+                vscode.postMessage({
+                    command: 'highlight_inline',
+                    id: rule_id,
+                    value: element.chr_new_goals[i].goal_text
+                });
         }
 
         return fmt;
@@ -1289,15 +1286,16 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-       ${element[i].goal_text}
+        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].goal_text}</span></span></pre>
     </div>
 `;
 
-            vscode.postMessage({
-                command: 'highlight_inline',
-                id: rule_id,
-                value: element[i].goal_text
-            });
+            if(window.enable_highlighting)
+                vscode.postMessage({
+                    command: 'highlight_inline',
+                    id: rule_id,
+                    value: element[i].goal_text
+                });
         }
 
         fmt += `
@@ -1342,15 +1340,16 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-       ${element[i].goal_text}
+        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].goal_text}</span></span></pre>
     </div>
 `;
 
-            vscode.postMessage({
-                command: 'highlight_inline',
-                id: rule_id,
-                value: element[i].goal_text
-            });
+            if(window.enable_highlighting)
+                vscode.postMessage({
+                    command: 'highlight_inline',
+                    id: rule_id,
+                    value: element[i].goal_text
+                });
         }
 
         fmt += `
@@ -1394,10 +1393,11 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 // Main entry point
 // /////////////////////////////////////////////////////////////////////////////
 
-    function trace(data) {
+    function trace(data, enable_highlighting) {
 
         // console.log('Tracing ...');
 
+        window.enable_highlighting = enable_highlighting;
         window.trace = data;
         window.inbox = {};
 
@@ -1666,17 +1666,23 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 
             window.inbox[i].goal_text_elided = elide(25, window.inbox[i].goal_text);
 
-            vscode.postMessage({
-                command: 'highlight',
-                index: i,
-                value: window.inbox[i].goal_text
-            });
+            if(window.enable_highlighting)
+                vscode.postMessage({
+                    command: 'highlight',
+                    index: i,
+                    value: window.inbox[i].goal_text
+                });
+            else
+                window.inbox[i].goal_text_highlighted = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text + '</span></span></pre>';
 
-            vscode.postMessage({
-                command: 'highlight_elided',
-                index: i,
-                value: window.inbox[i].goal_text_elided
-            });
+            if(window.enable_highlighting)
+                vscode.postMessage({
+                    command: 'highlight_elided',
+                    index: i,
+                    value: window.inbox[i].goal_text_elided
+                });
+            else
+                window.inbox[i].goal_text_highlighted_elided = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text_elided + '</span></span></pre>';
 
 // /////////////////////////////////////////////////////////////////////////////
         }
@@ -1703,69 +1709,69 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
             },
             updated: () => {
 
-                return;
+                // return;
 
-                if(window.popCount == window.inboxCount)
-                    return;
+                // if(window.popCount == window.inboxCount)
+                //     return;
 
-                for (var i = 0; i < window.inboxCount; i++, window.popCount++) {
-                    const pop = document.querySelector('#popcard-'+i);
-                    const tot = document.querySelector('#popttip-'+i);
+                // for (var i = 0; i < window.inboxCount; i++, window.popCount++) {
+                //     const pop = document.querySelector('#popcard-'+i);
+                //     const tot = document.querySelector('#popttip-'+i);
                     
-                    console.log('Creating popper for', i, pop, top);
+                //     console.log('Creating popper for', i, pop, top);
                     
-                    const popperInstance = Popper.createPopper(pop, tot, {
-                        placement: 'bottom',
-                        modifiers: [{
-                            name: 'offset',
-                            options: {
-                                offset: [0, 8],
-                            },
-                        }],
-                    });
+                //     const popperInstance = Popper.createPopper(pop, tot, {
+                //         placement: 'bottom',
+                //         modifiers: [{
+                //             name: 'offset',
+                //             options: {
+                //                 offset: [0, 8],
+                //             },
+                //         }],
+                //     });
                     
-                    function show() {
-                        // Make the tooltip visible
-                        tot.setAttribute('data-show', '');
+                //     function show() {
+                //         // Make the tooltip visible
+                //         tot.setAttribute('data-show', '');
                         
-                        // Enable the event listeners
-                        popperInstance.setOptions((options) => ({
-                            ...options,
-                            modifiers: [
-                                ...options.modifiers,
-                                { name: 'eventListeners', enabled: true },
-                            ],
-                        }));
+                //         // Enable the event listeners
+                //         popperInstance.setOptions((options) => ({
+                //             ...options,
+                //             modifiers: [
+                //                 ...options.modifiers,
+                //                 { name: 'eventListeners', enabled: true },
+                //             ],
+                //         }));
                         
-                        // Update its position
-                        popperInstance.update();
-                    }
+                //         // Update its position
+                //         popperInstance.update();
+                //     }
                     
-                    function hide() {
-                        // Hide the tooltip
-                        tot.removeAttribute('data-show');
+                //     function hide() {
+                //         // Hide the tooltip
+                //         tot.removeAttribute('data-show');
                         
-                        // Disable the event listeners
-                        popperInstance.setOptions((options) => ({
-                            ...options,
-                            modifiers: [
-                                ...options.modifiers,
-                                { name: 'eventListeners', enabled: false },
-                            ],
-                        }));
-                    }
+                //         // Disable the event listeners
+                //         popperInstance.setOptions((options) => ({
+                //             ...options,
+                //             modifiers: [
+                //                 ...options.modifiers,
+                //                 { name: 'eventListeners', enabled: false },
+                //             ],
+                //         }));
+                //     }
                     
-                    const showEvents = ['mouseenter', 'focus'];
-                    const hideEvents = ['mouseleave', 'blur'];
+                //     const showEvents = ['mouseenter', 'focus'];
+                //     const hideEvents = ['mouseleave', 'blur'];
                     
-                    showEvents.forEach((event) => {
-                        pop.addEventListener(event, show);
-                    });
+                //     showEvents.forEach((event) => {
+                //         pop.addEventListener(event, show);
+                //     });
                     
-                    hideEvents.forEach((event) => {
-                        pop.addEventListener(event, hide);
-                    });
-                }
+                //     hideEvents.forEach((event) => {
+                //         pop.addEventListener(event, hide);
+                //     });
+                // }
             },
             methods: {
 
@@ -1996,10 +2002,8 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
                     //     });
                     // }
                 },
-                switchTo: function(index) {
+                switchTo: function(index, runtime, step) {
 
-                    // console.log('Switching to', index);
-                    
                     $("#filter").val(''); filter('');
 
                     window.goal_navigation_index = index;
@@ -2011,7 +2015,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 
                     window.inboxVue.showMessage(destination.msg, destination.index);
 
-                    scrollTo(index);
+                    scrollTo(ids_for_rt_st(runtime, step)[0]);
 
                     window.prevent_nav_handling = false;
                 }

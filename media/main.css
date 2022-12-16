@@ -737,19 +737,3 @@ a.dropdown-item:hover
   content: '';
   transform: rotate(45deg);
 }
-
-.poptip[data-popper-placement^='top'] > #arrow {
-  bottom: -4px;
-}
-
-.poptip[data-popper-placement^='bottom'] > #arrow {
-  top: -4px;
-}
-
-.poptip[data-popper-placement^='left'] > #arrow {
-  right: -4px;
-}
-
-.poptip[data-popper-placement^='right'] > #arrow {
-  left: -4px;
-}
