@@ -17,11 +17,7 @@ on:
 jobs:
   build:
 
-    strategy:
-      matrix:
-        os: [ ubuntu-latest ]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest 
 
     steps:
     - name: Checkout
@@ -32,6 +28,7 @@ jobs:
       with:
         node-version: 16.x
 
+    - run: npm install -g vsce
     - run: npm install
     - run: vsce package
 
