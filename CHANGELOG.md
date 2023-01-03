@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.2.4
+
+- Fix search for binaries in $PATH
+
 ### 0.2.3
 
 - Better notifications
