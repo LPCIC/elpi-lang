@@ -2,8 +2,8 @@
 	"name": "elpi-lang",
 	"displayName": "Elpi lang",
 	"publisher": "gares",
-	"description": "Syntax highlighting for Elpi",
-	"version": "0.2.3",
+	"description": "Elpi programming language support",
+	"version": "0.2.4",
 	"homepage": "https://github.com/LPCIC/elpi-lang",
 	"repository": {
 		"type": "git",

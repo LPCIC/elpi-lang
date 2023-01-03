@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as parser from './trace';
+import * as path from 'path';
 
 import    os = require('node:os');
 import    cp = require('child_process');
@@ -220,6 +221,21 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         });
     }
 
+    private findFileOnPath(name: string) {
+        if (name.startsWith('/')) { return true };
+
+        const paths = (process.env.PATH || '')
+          .split(path.delimiter)
+          .map(x => path.resolve(x, name));
+        
+        for (const p of paths) {
+          if (fs.existsSync(p)) {
+            return true;
+          }
+        }
+        return false;
+      }
+
     private exec(command: string) {
 
         let result = cp.execSync(command).toString();
@@ -251,7 +267,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         
                 this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
-				if(!fs.existsSync(this._elpi_trace_elaborator.replace('$HOME', os.homedir()))) {
+				if(!this.findFileOnPath(this._elpi_trace_elaborator)) {
 					vscode.window
 					  .showInformationMessage(`Failed to find elpi trace elaborator`, 'Go to settings')
 					  .then(action => {
@@ -322,7 +338,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             this._elpi                  = configuration.elpi.path;
             this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
-			if(!fs.existsSync(this._elpi.replace('$HOME', os.homedir()))) {
+			if(!this.findFileOnPath(this._elpi)) {
 				vscode.window
 				  .showInformationMessage(`Failed to find elpi`, 'Go to settings')
 				  .then(action => {
@@ -332,7 +348,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 				return;
 			}
 
-			if(!fs.existsSync(this._elpi_trace_elaborator.replace('$HOME', os.homedir()))) {
+			if(!this.findFileOnPath(this._elpi_trace_elaborator)) {
 				vscode.window
 				  .showInformationMessage(`Failed to find elpi trace elaborator`, 'Go to settings')
 				  .then(action => {
@@ -394,7 +410,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         this._elpi                  = configuration.elpi.path;
         this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
-		if(!fs.existsSync(this._elpi.replace('$HOME', os.homedir()))) {
+		if(!this.findFileOnPath(this._elpi)) {
 			vscode.window
 			  .showInformationMessage(`Failed to find elpi`, 'Go to settings')
 			  .then(action => {
@@ -404,7 +420,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 			return;
 		}
 
-		if(!fs.existsSync(this._elpi_trace_elaborator.replace('$HOME', os.homedir()))) {
+		if(!this.findFileOnPath(this._elpi_trace_elaborator)) {
 			vscode.window
 			  .showInformationMessage(`Failed to find elpi trace elaborator`, 'Go to settings')
 			  .then(action => {
