@@ -234,7 +234,7 @@ html, body
 {
   height: 16px;
   width: 16px;
-  background-color: var(--vscode-charts-green);
+  background-color: var(--vscode-charts-blue);
   border-radius: 50%;
   border: 2px solid #999999;
   display: inline-block;
@@ -264,7 +264,7 @@ html, body
 {
   height: 16px;
   width: 16px;
-  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-green));
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 50%, var(--vscode-charts-blue));
   border-radius: 50%;
   border: 2px solid #999999;
   display: inline-block;
@@ -274,7 +274,7 @@ html, body
 {
   height: 16px;
   width: 16px;
-  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-red));
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 50%, var(--vscode-charts-red));
   border-radius: 50%;
   border: 2px solid #999999;
   display: inline-block;
@@ -369,8 +369,8 @@ hr
 
 .panel-heading
 {
-  color: var(--vscode-foreground);
-  background-color: var(--vscode-charts-blue);
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
 }
 
 .panel.is-danger .panel-heading
@@ -380,7 +380,7 @@ hr
 
 .panel.is-success .panel-heading
 {
-  background-color: var(--vscode-charts-green);
+  background-color: var(--vscode-charts-blue);
 }
 
 .tag:not(body)
@@ -398,7 +398,7 @@ hr
 .tag.tag-green
 {
   color: #ffffff;
-  background-color: var(--vscode-charts-green);
+  background-color: var(--vscode-charts-blue);
 }
 
 .tag.tag-yellow
@@ -410,13 +410,13 @@ hr
 .tag.tag-yellowgreen
 {
   color: #000000;
-  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-green));
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 50%, var(--vscode-charts-blue));
 }
 
 .tag.tag-yellowred
 {
   color: #000000;
-  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-red));
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 50%, var(--vscode-charts-red));
 }
 
 .tag.tag-grey
@@ -588,7 +588,7 @@ a.dropdown-item:hover
 
 .card-footer-green
 {
-  background-color: var(--vscode-charts-green);
+  background-color: var(--vscode-charts-blue);
 }
 
 .card-footer-yellow
@@ -603,12 +603,12 @@ a.dropdown-item:hover
 
 .card-footer-yellowgreen
 {
-  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-green));
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 50%, var(--vscode-charts-blue));
 }
 
 .card-footer-yellowred
 {
-  background: linear-gradient(90deg, var(--vscode-charts-yellow), 80%, var(--vscode-charts-red));
+  background: linear-gradient(90deg, var(--vscode-charts-yellow), 50%, var(--vscode-charts-red));
 }
 
 /* ***************************************************************************
@@ -623,12 +623,12 @@ a.dropdown-item:hover
   --shiki-color-text: var(--vscode-symbolIcon-textForeground);
   --shiki-color-background: var(--vscode-sideBar-background);
   --shiki-token-constant: var(--vscode-charts-blue);
-  --shiki-token-string: var(--vscode-charts-green);
+  --shiki-token-string: var(--vscode-charts-blue);
   --shiki-token-comment: var(--vscode-charts-lines);
   --shiki-token-keyword: var(--vscode-charts-purple);
   --shiki-token-parameter: var(--vscode-charts-purple);
   --shiki-token-function: var(--vscode-charts-blue);
-  --shiki-token-string-expression: var(--vscode-charts-green);
+  --shiki-token-string-expression: var(--vscode-charts-blue);
   --shiki-token-punctuation: var(--vscode-charts-orange) ;
   --shiki-token-link: var(--vscode-charts-blue);
 }

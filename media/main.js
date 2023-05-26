@@ -302,8 +302,33 @@
         let ds_s = -1;
         let ds_g = -1;
 
-        for(var i = 0; i < card.step.value.more_successful_attempts.length; i++) {
-            let step_id = card.step.value.more_successful_attempts[i];
+        let all_attempts = card.step.value.more_successful_attempts.concat(card.step.value.more_failing_attempts);
+
+
+        for(var i = 0; i < all_attempts.length; i++) {
+            let step_id = all_attempts[i];
+            let runt_id = card.runtime_id;
+            let goal_ds = [];
+
+            goal_ds[0] = step_id;
+
+            for(var j = 0; j < trace.length; j++) {
+                if(trace[j].step_id    == step_id
+                && trace[j].runtime_id == runt_id) {
+                    goal_ds[1] = goal_id(trace[j].step);
+                    break;
+                }
+            }
+                    
+            goal_ds[2] = ids_for_rt_st_gl(ds_r, goal_ds[0], goal_ds[1])[0];
+            destinations.push(goal_ds);
+
+        }
+        return destinations;
+
+
+        for(var i = 0; i < all_attempts.length; i++) {
+            let step_id = all_attempts[i];
             let runt_id = card.runtime_id;
 
             // console.log('goal_status_label', 'seeking goal id for', step_id, runt_id);
@@ -510,7 +535,7 @@
         contents += format_successful_attempts(step.value.successful_attempts, r_id, s_id);
         if (status.includes("Yellow") && card.step.kind == "Inference")
         {
-            contents += format_more_successful_attempts(msg.data, window.trace, r_id, s_id);
+            contents += format_more_attempts(msg.data, window.trace, r_id, s_id);
         }
         contents += format_stack(step.value.stack, r_id, s_id);
 
@@ -811,19 +836,23 @@ ${step.value.findall_solution_text}
         return contents;
     }
 
-    function format_more_successful_attempts(card, trace, r_id, s_id)
+    function format_more_attempts(card, trace, r_id, s_id)
     {
-        // console.log('Formatting more successful attempts', JSON.stringify(card.step.value.more_successful_attempts));
+        // console.log('Formatting more attempts', JSON.stringify(card.step.value.more_successful_attempts), JSON.stringify(card.step.value.more_failing_attempts));
 
         let contents = "";
 
-        if(card.step.value.more_successful_attempts == undefined)
+        if(card.step.value.more_successful_attempts == undefined && card.step.value.more_failing_attempts == undefined)
             return contents;
 
+        let panel_class = "is-success";
+        if (card.step.value.more_successful_attempts.length == 0)
+            panel_class = "is-danger";
+
         contents = `
-<article class="panel is-success">
+<article class="panel ${panel_class}">
     <div class="panel-heading">
-        More successful attempts (${card.step.value.more_successful_attempts.length})
+        More attempts (${card.step.value.more_successful_attempts.length} / ${card.step.value.more_failing_attempts.length})
         <span id="toggle_ms" class="tag" style="float:right;">Toggle</span>
     </div>
     <div>

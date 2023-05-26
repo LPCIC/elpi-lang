@@ -3,7 +3,7 @@
 	"displayName": "Elpi lang",
 	"publisher": "gares",
 	"description": "Elpi programming language support",
-	"version": "0.2.4",
+	"version": "0.2.5",
 	"homepage": "https://github.com/LPCIC/elpi-lang",
 	"repository": {
 		"type": "git",
@@ -91,7 +91,7 @@
 				},
 				"elpi.elpi_trace_view.syntax_highlighting": {
 					"type": "boolean",
-					"default": "true",
+					"default": "false",
 					"markdownDescription": "Highlight elpi code statements"
 				}
 			}
