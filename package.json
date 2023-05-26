@@ -187,7 +187,7 @@
 		"@types/vscode": "^1.50.0",
 		"@typescript-eslint/eslint-plugin": "^5.19.0",
 		"@typescript-eslint/parser": "^5.19.0",
-		"@vscode/vsce": "^2.15.0",
+		"@vscode/vsce": "^2.19.0",
 		"child-process": "^1.0.2",
 		"eslint": "^8.13.0",
 		"mustache": "^4.0.1",
