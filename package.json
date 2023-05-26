@@ -91,7 +91,7 @@
 				},
 				"elpi.elpi_trace_view.syntax_highlighting": {
 					"type": "boolean",
-					"default": "true",
+					"default": "false",
 					"markdownDescription": "Highlight elpi code statements"
 				}
 			}
