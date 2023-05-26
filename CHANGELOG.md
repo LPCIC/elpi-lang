@@ -1,5 +1,10 @@
 # Change Log
 
+### 0.2.5
+
+- Colorblind friendly color schema
+- Fix display of (moltiple) additional attempts for the same goal
+
 ### 0.2.4
 
 - Fix search for binaries in $PATH
