@@ -1,9 +1,13 @@
 # Change Log
 
+### 0.2.6
+
+- Fix syntax highlight for type declaration
+
 ### 0.2.5
 
 - Colorblind friendly color schema
-- Fix display of (moltiple) additional attempts for the same goal
+- Fix display of (multiple) additional attempts for the same goal
 
 ### 0.2.4
 

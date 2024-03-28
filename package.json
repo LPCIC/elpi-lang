@@ -3,7 +3,7 @@
 	"displayName": "Elpi lang",
 	"publisher": "gares",
 	"description": "Elpi programming language support",
-	"version": "0.2.5",
+	"version": "0.2.6",
 	"homepage": "https://github.com/LPCIC/elpi-lang",
 	"repository": {
 		"type": "git",
