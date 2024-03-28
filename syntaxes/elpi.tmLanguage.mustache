@@ -279,18 +279,24 @@
 					"name": "entity.name.function"
 				}
 			},
-			"endCaptures": {
-				"1": {
-					"name": "keyword.control.elpi"
-				}
-			},
 			"patterns": [
 				{
-					"match": "{{{typechars}}}",
-					"name": "entity.name.type"
-				},
-				{
-					"include": "#comments"
+					"begin": "",
+					"end": "(\\.\\s)",
+					"endCaptures": {
+						"1": {
+							"name": "keyword.control.elpi"
+						}
+					},
+					"patterns": [
+						{
+							"match": "{{{typechars}}}",
+							"name": "entity.name.type"
+						},
+						{
+							"include": "#comments"
+						}
+					]
 				}
 			]
 		},
@@ -431,7 +437,7 @@
 		},
 		"binders": {
 			"name": "binder.elpi",
-			"begin": "{{{wbl}}}(pi|sigma) (({{{ident}}}|{{{var}}}| )+)", 
+			"begin": "{{{wbl}}}(pi|sigma) (({{{ident}}}|{{{var}}}| )+)",
 			"end": "(\\\\)",
 			"beginCaptures": {
 				"1": {
