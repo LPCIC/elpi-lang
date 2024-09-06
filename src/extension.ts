@@ -6,7 +6,9 @@ export function activate(context: vscode.ExtensionContext) {
 	const tracer = new provider.TraceProvider(context.extensionUri);
 
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(provider.TraceProvider.viewType, tracer));
+		vscode.window.registerWebviewViewProvider(provider.TraceProvider.viewType, tracer, {
+			webviewOptions: {retainContextWhenHidden: true}
+		}));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('elpi.open', () => {
