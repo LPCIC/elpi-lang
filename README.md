@@ -11,7 +11,7 @@ This extension provides support for the [Elpi](https://github.com/LPCIC/elpi) pr
 
 ## Requirements
 
-- Node 1.16+
+- Node 1.18+
 - VSCode 1.49+
 - Elpi 1.16+
 
