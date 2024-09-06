@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.2.7
+
+- Fix trace panel is now retained when hidden
+
 ### 0.2.6
 
 - Fix syntax highlight for type declaration
