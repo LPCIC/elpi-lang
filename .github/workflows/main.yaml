@@ -30,7 +30,7 @@ jobs:
       - run: vsce package
 
       - name: Save Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'extension package ${{ matrix.node-version }}'
           path: ./elpi-lang-*.vsix
