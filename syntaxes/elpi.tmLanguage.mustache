@@ -88,6 +88,14 @@
 					"name": "entity.name.tag"
 				},
 				{
+					"match": ":functional",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": ":untyped",
+					"name": "entity.name.tag"
+				},
+				{
 					"match": ":name\\s+\"\\S+\"",
 					"name": "entity.name.tag"
 				},
@@ -171,7 +179,7 @@
 		},
 		"pred-declaration": {
 			"name": "pred.declaration",
-			"begin": "^(\\s*(external)?\\s*pred)\\s+({{{ident}}}|{{{infix}}})",
+			"begin": "((external)?\\s*(pred|func))\\s+({{{ident}}}|{{{infix}}})",
 			"end": "(?<=\\.\\s)",
 			"beginCaptures": {
 				"1": {
@@ -181,6 +189,9 @@
 					"name": "keyword.control.elpi"
 				},
 				"3": {
+					"name": "keyword.control.elpi"
+				},
+				"4": {
 					"name": "entity.name.function"
 				}
 			},
