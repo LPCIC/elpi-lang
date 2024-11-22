@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
     inputs:
       publish_vsx:
-        description: 'Upload to the main store'
+        description: 'Upload to the main store (even if not a tag)'
         required: true
         default: false
       publish_open_vsx:
-        description: 'Upload to the open vsx store'
+        description: 'Upload to the open vsx store (even if not a tag)'
         required: true
         default: false
     
@@ -33,14 +33,16 @@ jobs:
     - run: npm run build
     - run: vsce package
 
-    - name: Publish
-      if: success() && (startsWith(github.ref, 'refs/tags/') || ${{  github.event.inputs.publish_vsx }})
-      run: npm run deploy
-      env:
-        VSCE_PAT: ${{ secrets.VSCE_PAT }}
-
     - name: Publish to Open VSX Registry
       if: success() && (startsWith(github.ref, 'refs/tags/') || ${{  github.event.inputs.publish_open_vsx }})
       uses: HaaLeo/publish-vscode-extension@v1
       with:
         pat: ${{ secrets.OPEN_VSX_TOKEN }}
+
+    - name: Publish to the main store
+      if: success() && (startsWith(github.ref, 'refs/tags/') || ${{  github.event.inputs.publish_vsx }})
+      run: npm run deploy
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_PAT }}
+  
+  
