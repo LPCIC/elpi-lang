@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.2.9
+
+- Fix tracer (depend on vue 2.7)
+
 ### 0.2.8
 
 - Syntax for Elpi 2.0

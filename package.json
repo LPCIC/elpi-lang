@@ -3,7 +3,7 @@
 	"displayName": "Elpi lang",
 	"publisher": "gares",
 	"description": "Elpi programming language support",
-	"version": "0.2.8",
+	"version": "0.2.9",
 	"homepage": "https://github.com/LPCIC/elpi-lang",
 	"repository": {
 		"type": "git",
@@ -205,6 +205,6 @@
 		"fuzzball": "^2.1.2",
 		"jquery": "^3.6.1",
 		"shiki": "^0.10.1",
-		"vue": "^3.0.0"
+		"vue": "^2.7.0"
 	}
 }
