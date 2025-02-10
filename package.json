@@ -76,7 +76,7 @@
 			"properties": {
 				"elpi.elpi.options": {
 					"type": "string",
-					"default": "-no-tc -trace-on json [OUTPUT] -trace-at run 0 999 -trace-only user",
+					"default": "-trace-on json [OUTPUT] -trace-at run 0 999 -trace-only user",
 					"markdownDescription": "Command line arguments"
 				},
 				"elpi.elpi.path": {
