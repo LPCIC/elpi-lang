@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.2.10
+
+- Fix tracer default options for elpi 2.x
+
 ### 0.2.9
 
 - Fix tracer (depend on vue 2.7)
