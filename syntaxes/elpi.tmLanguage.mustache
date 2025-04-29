@@ -179,7 +179,7 @@
 		},
 		"pred-declaration": {
 			"name": "pred.declaration",
-			"begin": "((external)?\\s*(pred|func))\\s+({{{ident}}}|{{{infix}}})",
+			"begin": "((external)?\\s*(pred|func|symbol))\\s+({{{ident}}}|{{{infix}}})\\s*:?",
 			"end": "(?<=\\.\\s)",
 			"beginCaptures": {
 				"1": {
@@ -195,32 +195,26 @@
 					"name": "entity.name.function"
 				}
 			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
 			"patterns": [
 				{
-					"begin": "{{{wbl}}}(i:|o:)",
-					"end": "(,|\\.\\s)",
-					"beginCaptures": {
-						"1": {
-							"name": "entity.name.tag"
-						}
-					},
-					"endCaptures": {
-						"1": {
-							"name": "keyword.control.elpi"
-						}
-					},
-					"patterns": [
-						{
-							"include": "#comments"
-						},
-						{
-							"match": "{{{typechars}}}",
-							"name": "entity.name.type"
-						}
-					]
+					"include": "#comments"
 				},
 				{
-					"include": "#comments"
+					"match": "(->|func|pred|,|\\(|\\))",
+					"name": "keyword.control.elpi"
+				},
+				{
+					"match": "(i:|o:)",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "{{{typechars}}}",
+					"name": "entity.name.type"
 				}
 			]
 		},
