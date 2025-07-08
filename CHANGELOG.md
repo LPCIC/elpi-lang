@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.3.1
+
+- Syntax for Elpi 3.0
+
 ### 0.2.11
 
 - Syntax for Elpi 3.0
