@@ -22,7 +22,7 @@
                 break;
             case 'trace':
                 clear();
-                trace(message.trace, message.enable_highlighting);
+                trace(message.trace);
                 $("#trace-information").val(message.file + ' on ' + new Date().toISOString());
                 break;
             case 'clear':
@@ -44,7 +44,7 @@
 
     function elide(i, str) {
 
-        if (str.length < i)
+        if (str.length < 2*i)
             return str;
 
         return str.replace(str.slice(i,-i),' ... ');
@@ -656,12 +656,6 @@ ${step.value.findall_solution_text}
 <br/>
 `;
 
-        if(window.enable_highlighting)
-            vscode.postMessage({
-                command: 'highlight_inline',
-                id: rule_id,
-                value: step.value.suspend_sibling.goal_text
-            });
 
         contents += format_stack(step.value.suspend_stack, r_id, s_id);
 
@@ -706,15 +700,9 @@ ${step.value.findall_solution_text}
         <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${step.value[i].goal_text}</span></span></pre>
     </div>
 `;
-
-        if(window.enable_highlighting) vscode.postMessage({
-                command: 'highlight_inline',
-                id: rule_id,
-                value: step.value[i].goal_text
-            });
         }
 
-      contents += `
+        contents += `
   </div>
   <div class="panel-element panel-element-footer"></div>
 </article>
@@ -985,19 +973,29 @@ ${step.value.findall_solution_text}
 
     function format_rule(element, r_id, s_id, g_id)
     {
-        // console.log('Formatting rule', JSON.stringify(element));
+
+      //return('<div>' + JSON.stringify(element) + '</div>');
+      //element = {"kind":"BuiltinRule","value":{"name":"implication","kind":{"kind":"Logic"},"payload":[]}}
 
         const rule_type = element.kind;
 
         let rule_text = "";
+        let rule_text_full = "";
         let rule_id = r_id + '-' + s_id + '-' + g_id + '-' + window.rnb++;
 
-        if (rule_type == "UserRule")
+        if (rule_type == "UserRule") {
             rule_text = element.value.rule_text;
+            rule_text_full = rule_text
+        }
 
         if (rule_type == "BuiltinRule")
-            rule_text = element.value.kind + ' - ' + element.value.value;
-        
+            if (element.value.name) {// v2
+                rule_text = element.value.kind.kind + ' - ' + element.value.name + ': ' + element.value.payload.join('\n');
+                rule_text_full = element.value.payload.join('\n');
+            } else { //v1
+                rule_text = element.value.kind + ' - ' + element.value.value;
+                rule_text_full = rule_text
+            }
         // rule_text = rule_text.trim();
 
         let fmt = `
@@ -1059,14 +1057,8 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
 
 </div>
 <div id="${rule_id}" class="is-collapsible rule-inline">
-    <pre class="shiki" style="background-color: var(--shiki-color-background)"><span style="color: var(--shiki-color-text)">${rule_text}</span></pre>
+    <pre class="shiki" style="background-color: var(--shiki-color-background)"><span style="color: var(--shiki-color-text)">${rule_text_full}</span></pre>
 </div>`;
-
-        if(window.enable_highlighting) vscode.postMessage({
-            command: 'highlight_inline',
-            id: rule_id,
-            value: rule_text
-        });
         
         return fmt;
     }
@@ -1099,11 +1091,6 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                         <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].value}</span></span></pre>
                     </div>`;
         
-            if(window.enable_highlighting) vscode.postMessage({
-                command: 'highlight_inline',
-                id: rule_id,
-                value: element[i].value
-            });
         }
 
         return fmt;
@@ -1171,11 +1158,6 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                         </div>`;
             }
 
-            if(window.enable_highlighting) vscode.postMessage({
-                command: 'highlight_inline',
-                id: rule_id,
-                value: element[i].goal_text
-            });    
         }
 
         return fmt;
@@ -1217,12 +1199,6 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 <div id="${rule_id}" class="is-collapsible rule-inline">
     <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${attempt_text}</span></span></pre>
 </div>`;
-
-        if(window.enable_highlighting) vscode.postMessage({
-                command: 'highlight_inline',
-                id: rule_id,
-                value: attempt_text
-            });
         
         return fmt;
     }
@@ -1272,12 +1248,6 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     </div>
 `;
 
-            if(window.enable_highlighting)
-                vscode.postMessage({
-                    command: 'highlight_inline',
-                    id: rule_id,
-                    value: element.chr_new_goals[i].goal_text
-                });
         }
 
         return fmt;
@@ -1319,12 +1289,6 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     </div>
 `;
 
-            if(window.enable_highlighting)
-                vscode.postMessage({
-                    command: 'highlight_inline',
-                    id: rule_id,
-                    value: element[i].goal_text
-                });
         }
 
         fmt += `
@@ -1373,12 +1337,6 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     </div>
 `;
 
-            if(window.enable_highlighting)
-                vscode.postMessage({
-                    command: 'highlight_inline',
-                    id: rule_id,
-                    value: element[i].goal_text
-                });
         }
 
         fmt += `
@@ -1422,11 +1380,10 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 // Main entry point
 // /////////////////////////////////////////////////////////////////////////////
 
-    function trace(data, enable_highlighting) {
+    function trace(data) {
 
         // console.log('Tracing ...');
 
-        window.enable_highlighting = enable_highlighting;
         window.trace = data;
         window.inbox = {};
 
@@ -1695,23 +1652,9 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 
             window.inbox[i].goal_text_elided = elide(25, window.inbox[i].goal_text);
 
-            if(window.enable_highlighting)
-                vscode.postMessage({
-                    command: 'highlight',
-                    index: i,
-                    value: window.inbox[i].goal_text
-                });
-            else
-                window.inbox[i].goal_text_highlighted = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text + '</span></span></pre>';
+            window.inbox[i].goal_text_highlighted = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text + '</span></span></pre>';
 
-            if(window.enable_highlighting)
-                vscode.postMessage({
-                    command: 'highlight_elided',
-                    index: i,
-                    value: window.inbox[i].goal_text_elided
-                });
-            else
-                window.inbox[i].goal_text_highlighted_elided = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text_elided + '</span></span></pre>';
+            window.inbox[i].goal_text_highlighted_elided = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text_elided + '</span></span></pre>';
 
 // /////////////////////////////////////////////////////////////////////////////
         }

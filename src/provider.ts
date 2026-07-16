@@ -1,14 +1,36 @@
 import * as vscode from 'vscode';
-import * as parser from './trace';
+import * as parser_v1 from './trace_v1';
+import * as parser_v2 from './trace_v2';
 import * as path from 'path';
 
 import    os = require('node:os');
 import    cp = require('child_process');
 import    fs = require('fs');
-// import   tmp = require('tmp');
-import shiki = require('shiki');
 
 import chokidar = require('chokidar');
+
+type TraceParser = {
+    readTrace: (x: any, context?: any) => any;
+};
+
+const traceParsers: TraceParser[] = [parser_v2, parser_v1];
+
+function any_parser_readTrace(x: any) {
+    let lastError: unknown;
+
+    for (const parser of traceParsers) {
+        try {
+            return parser.readTrace(x);
+        } catch (error) {
+            lastError = error;
+        }
+    }
+
+    if (lastError instanceof Error)
+        throw lastError;
+
+    throw new Error('Failed to parse trace with all available parser versions.');
+}
 
 export class TraceProvider implements vscode.WebviewViewProvider {
 
@@ -17,7 +39,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
     private _cat: string;
     private _elpi: string;
     private _elpi_trace_elaborator: string;
-    private _highlighter: shiki.Highlighter | undefined;
     private _options: string;
     private _options_default: string;
     private _view?: vscode.WebviewView;
@@ -70,11 +91,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         this._watcher_target = this._target_dir + "traced.tmp.json";
         this._watcher_target_elaborated = this._target_dir + "traced.json";
 
-        shiki.getHighlighter({theme: 'css-variables'}).then(highlighter => {
-            this._highlighter = highlighter;
-            this._highlighter.loadLanguage(elpi_lang);
-        });
-
         if (os.platform().toString().toLowerCase() == "win32")
             this._cat = "type";
         else
@@ -107,9 +123,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
                 const indx = message.index;
                   let html = undefined;
 
-                if (this._highlighter)
-                    html = this._highlighter.codeToHtml(code, { lang: 'elpi' });
-
                 if (this._view)
                     this._view.webview.postMessage({
                         type: 'highlight',
@@ -124,10 +137,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
                 const code = message.value;
                 const indx = message.index;
                 let html = undefined;
-                
-                if (this._highlighter)
-                    html = this._highlighter.codeToHtml(code, { lang: 'elpi' });
-                
+                                
                 if (this._view)
                     this._view.webview.postMessage({
                         type: 'highlight_elided',
@@ -142,10 +152,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
                 const code = message.value;
                 const id = message.id;
                 let html = undefined;
-                
-                if (this._highlighter)
-                    html = this._highlighter.codeToHtml(code, { lang: 'elpi' });
-                
+                                
                 if (this._view)
                     this._view.webview.postMessage({
                         type: 'highlight_inline',
@@ -284,14 +291,12 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
                 this.exec(this._cat + " " + fileUri[0].fsPath + " | " + this._elpi_trace_elaborator + " > " + this._target);
 
-                const trace = parser.readTrace(JSON.parse(fs.readFileSync(this._target, 'utf8')));
+                const trace = any_parser_readTrace(JSON.parse(fs.readFileSync(this._target, 'utf8')));
 
                 this._source = fileUri[0].fsPath;
 
-                let enable_highlighting = configuration.elpi_trace_view.syntax_highlighting;
-
                 if (this._view)
-                    this._view.webview.postMessage({ type: 'trace', trace: trace, file: fileUri[0].fsPath, enable_highlighting: enable_highlighting });
+                    this._view.webview.postMessage({ type: 'trace', trace: trace, file: fileUri[0].fsPath });
                 
                 if (this._view)
                     this._view.webview.postMessage({ type: 'progress', state: 'off' });
@@ -358,8 +363,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 				return;
 			}
 
-            let enable_highlighting = configuration.elpi_trace_view.syntax_highlighting;
-
             message = `File ${path} has been changed`;
 
             vscode.window.showInformationMessage(message);
@@ -368,12 +371,12 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
             this.exec("eval $(opam env) && cat " + this._watcher_target + " | " + this._elpi_trace_elaborator + " > " + this._watcher_target_elaborated);
 
-            const trace = parser.readTrace(JSON.parse(fs.readFileSync(this._watcher_target_elaborated, 'utf8')));
+            const trace = any_parser_readTrace(JSON.parse(fs.readFileSync(this._watcher_target_elaborated, 'utf8')));
 
             this._source = this._watcher_target;
 
             if (this._view)
-                this._view.webview.postMessage({ type: 'trace', trace: trace, file: 'Watched', enable_highlighting: enable_highlighting });
+                this._view.webview.postMessage({ type: 'trace', trace: trace, file: 'Watched' });
         });
 
         message = "Me watch has started. Try me by touching " + this._watcher_target;
@@ -432,8 +435,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         this._options_default = configuration.elpi.options;
 
-        let enable_highlighting = configuration.elpi_trace_view.syntax_highlighting;
-
         if(vscode.window.activeTextEditor == undefined)
             return;
 
@@ -470,12 +471,12 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         // --
 
-        const trace = parser.readTrace(JSON.parse(fs.readFileSync(this._target, 'utf8')))
+        const trace = any_parser_readTrace(JSON.parse(fs.readFileSync(this._target, 'utf8')))
 
         // --- Send message to the view backend
 
         if (this._view)
-            this._view.webview.postMessage({ type: 'trace', trace: trace, file: current_file, enable_highlighting: enable_highlighting });
+            this._view.webview.postMessage({ type: 'trace', trace: trace, file: current_file });
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
