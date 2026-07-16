@@ -1795,20 +1795,18 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
                     code += `
 </div>
 `;
-                    $('.message .goal').html(code);
-		    
-                    // $('.message .goal').html(msg.goal_text_highlighted);
+                    $('#message-pane .goal').html(code);
 
-                    $('.message .goal_id').html(msg.goal_id);
+                    $('#message-pane .goal_id').html(msg.goal_id);
 
-                    $('.message .top .tags .rid').text(msg.rt);
-                    $('.message .top .tags .sid').text(msg.id);
+                    $('#message-pane .top .tags .rid').text(msg.rt);
+                    $('#message-pane .top .tags .sid').text(msg.id);
 
 // /////////////////////////////////////////////////////////////////////////////
 // TODO: Card pane refactoring entry point
 // /////////////////////////////////////////////////////////////////////////////
 
-                    $('.message .card_content').html(format(msg));
+                    $('#message-pane .card_content').html(format(msg));
 
 // /////////////////////////////////////////////////////////////////////////////
 

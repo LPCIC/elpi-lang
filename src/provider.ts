@@ -519,7 +519,7 @@ return `<!DOCTYPE html>
 
         <title>Elpi Tracer</title>
     </head>
-    <body>
+    <body class="has-navbar-fixed-top has-navbar-fixed-bottom">
 
         <div class="columns" id="tracer">
 
@@ -666,7 +666,7 @@ return `<!DOCTYPE html>
                  ;; Message Pane
                  ;; !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
 
-            <div class="column is-7 message hero is-fullheight is-hidden" id="message-pane">
+            <div class="column is-7 messages hero is-fullheight is-hidden" id="message-pane">
 
            <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 ;; Message Pane - Preview
