@@ -700,6 +700,22 @@ a.dropdown-item:hover
 }
 
 /* ****************************************************************************
+ * Location tooltips
+ * **************************************************************************** */
+
+[data-tooltip]:not(.is-disabled)::before,
+[data-tooltip]:not(.is-loading)::before,
+[data-tooltip]:not([disabled])::before {
+    left: auto;
+}
+
+[data-tooltip]:not(.is-disabled)::after,
+[data-tooltip]:not(.is-loading)::after,
+[data-tooltip]:not([disabled])::after {
+    left: 10%;
+}
+
+/* ****************************************************************************
  * 
  * **************************************************************************** */
 
