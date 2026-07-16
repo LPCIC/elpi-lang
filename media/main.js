@@ -5,18 +5,35 @@
 
     const oldState = vscode.getState();
 
+    let highlight_queue = [];
+
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', event => {
         const message = event.data; // The json data that the extension sent
         switch (message.type) {
             case 'highlight':
-                // console.log('Got', message.html, 'for', message.indx);
-                window.inbox[message.indx].goal_text_highlighted = message.html;
-                break;
             case 'highlight_elided':
-                    // console.log('Got', message.html, 'for', message.indx);
-                    window.inbox[message.indx].goal_text_highlighted_elided = message.html;
-                    break;
+                // Batch highlighting requests; since the highlight information
+                // is passed through a MessagePort, we can't take advantage of Vue's
+                // automatic batching, because the messages won't be processed in the same
+                // tick
+                highlight_queue.push(message)
+                break;
+            case 'flush_highlight': {
+                let msg;
+                while (typeof (msg = highlight_queue.shift()) !== 'undefined') {
+                    switch (msg.type) {
+                        case 'highlight':
+                            window.inbox[msg.indx].goal_text_highlighted = msg.html;
+                            break;
+                        case 'highlight_elided':
+                            window.inbox[msg.indx].goal_text_highlighted_elided = msg.html;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
             case 'highlight_inline':
                 $('#' + message.id).html(message.html);
                 break;
@@ -1701,6 +1718,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
                     index: i,
                     value: window.inbox[i].goal_text
                 });
+
             else
                 window.inbox[i].goal_text_highlighted = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text + '</span></span></pre>';
 
@@ -1710,11 +1728,18 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
                     index: i,
                     value: window.inbox[i].goal_text_elided
                 });
+
             else
                 window.inbox[i].goal_text_highlighted_elided = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text_elided + '</span></span></pre>';
 
 // /////////////////////////////////////////////////////////////////////////////
         }
+
+        if (window.enable_highlighting)
+            vscode.postMessage({
+                command: 'flush_highlight'
+            });
+
 
 // /////////////////////////////////////////////////////////////////////////////
 

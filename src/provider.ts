@@ -137,6 +137,14 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
                 break;
             }
+            case 'flush_highlight':
+            {
+                if (this._view)
+                    this._view.webview.postMessage({
+                        type: 'flush_highlight'
+                    })
+                break;
+            }
             case 'highlight_inline':
             {
                 const code = message.value;
