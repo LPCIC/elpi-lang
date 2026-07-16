@@ -105,10 +105,10 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             {
                 const code = message.value;
                 const indx = message.index;
-                  let html = undefined;
-
-                if (this._highlighter)
-                    html = this._highlighter.codeToHtml(code, { lang: 'elpi' });
+                const html =
+                    this._highlighter
+                    ? this._highlighter.codeToHtml(code, { lang: 'elpi' })
+                    : code;
 
                 if (this._view)
                     this._view.webview.postMessage({
@@ -123,36 +123,36 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             {
                 const code = message.value;
                 const indx = message.index;
-                let html = undefined;
-                
-                if (this._highlighter)
-                    html = this._highlighter.codeToHtml(code, { lang: 'elpi' });
-                
+                const html =
+                    this._highlighter
+                    ? this._highlighter.codeToHtml(code, { lang: 'elpi' })
+                    : code;
+
                 if (this._view)
                     this._view.webview.postMessage({
                         type: 'highlight_elided',
                         html: html,
                         indx: indx
                     });
-    
+
                 break;
             }
             case 'highlight_inline':
             {
                 const code = message.value;
                 const id = message.id;
-                let html = undefined;
-                
-                if (this._highlighter)
-                    html = this._highlighter.codeToHtml(code, { lang: 'elpi' });
-                
+                const html =
+                    this._highlighter
+                    ? this._highlighter.codeToHtml(code, { lang: 'elpi' })
+                    : code;
+
                 if (this._view)
                     this._view.webview.postMessage({
                         type: 'highlight_inline',
                         html: html,
                         id: id
                     });
-    
+
                 break;
             }
             case 'notify':
