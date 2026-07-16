@@ -70,10 +70,10 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         this._watcher_target = this._target_dir + "traced.tmp.json";
         this._watcher_target_elaborated = this._target_dir + "traced.json";
 
-        shiki.getHighlighter({theme: 'css-variables'}).then(highlighter => {
-            this._highlighter = highlighter;
-            this._highlighter.loadLanguage(elpi_lang);
-        });
+        shiki.getHighlighter({theme: 'css-variables', langs: [elpi_lang]})
+            .then(highlighter => {
+                this._highlighter = highlighter;
+            });
 
         if (os.platform().toString().toLowerCase() == "win32")
             this._cat = "type";
