@@ -1,5 +1,11 @@
 # Change Log
 
+
+### 0.3.2
+
+- No more shiki
+- Support multiple trace versions
+
 ### 0.3.1
 
 - Syntax for Elpi 3.0
