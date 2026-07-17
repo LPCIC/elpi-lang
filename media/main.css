@@ -22,11 +22,8 @@ html, body
   padding: 40px 20px;
 }
 
-.message
-{
-  display:block;
-  background-color: var(--vscode-sideBar-background);
-  padding: 10px 20px;
+.messages a:not(.button):not(.tag) {
+    color: currentColor;
 }
 
 /* .messages .action-buttons */
@@ -85,14 +82,8 @@ html, body
   border-radius: 0;
 }
 
-.inbox-messages
-{
-  margin-top:30px;
-}
-
 .message-preview
 {
-  margin-top: 60px;
   border: 1px solid var(--vscode-panel-border); /* Decrease opacity later on */
 }
 
@@ -563,7 +554,11 @@ a.dropdown-item:hover
 #message-feed
 {
   overflow-y: auto;
-  height: 100px;
+  /* height: 100px; */
+  /* Bulma has a class for full-height with navbar, but doesn't have one
+     for full-height with *two* navbars */
+  min-height: calc(100vh - 2*3.25rem) !important;
+  max-height: calc(100vh - 2*3.25rem);
 }
 
 #trace-information {
@@ -702,6 +697,22 @@ a.dropdown-item:hover
 #message-pane .rule-inline pre
 {
   font-size: 1em;
+}
+
+/* ****************************************************************************
+ * Location tooltips
+ * **************************************************************************** */
+
+[data-tooltip]:not(.is-disabled)::before,
+[data-tooltip]:not(.is-loading)::before,
+[data-tooltip]:not([disabled])::before {
+    left: auto;
+}
+
+[data-tooltip]:not(.is-disabled)::after,
+[data-tooltip]:not(.is-loading)::after,
+[data-tooltip]:not([disabled])::after {
+    left: 10%;
 }
 
 /* ****************************************************************************
