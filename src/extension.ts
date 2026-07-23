@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('elpi.open', () => {
 			tracer.open();
 		}));
-	
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('elpi.save', () => {
 			tracer.save();
@@ -23,16 +23,6 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('elpi.trace', () => {
 			tracer.trace();
-		}));
-
-	context.subscriptions.push(
-		vscode.commands.registerCommand('elpi.watch_start', () => {
-			tracer.watch_start();
-		}));
-
-	context.subscriptions.push(
-		vscode.commands.registerCommand('elpi.watch_stop', () => {
-			tracer.watch_stop();
 		}));
 
 	context.subscriptions.push(

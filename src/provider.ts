@@ -7,8 +7,6 @@ import    os = require('node:os');
 import    cp = require('child_process');
 import    fs = require('fs');
 
-import chokidar = require('chokidar');
-
 type TraceParser = {
     readTrace: (x: any, context?: any) => any;
 };
@@ -46,9 +44,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
     private _target: string;
     private _target_raw: string;
     private _target_dir: string;
-    private _watcher: chokidar.FSWatcher | undefined;
-    private _watcher_target: string;
-    private _watcher_target_elaborated: string;
 
     private _channel: any = vscode.window.createOutputChannel('Elpi');
 
@@ -73,9 +68,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         this._target = this._target_dir + "trace.json";
         this._target_raw = this._target_dir + "trace.tmp.json";
-
-        this._watcher_target = this._target_dir + "traced.tmp.json";
-        this._watcher_target_elaborated = this._target_dir + "traced.json";
 
         if (os.platform().toString().toLowerCase() == "win32")
             this._cat = "type";
@@ -264,87 +256,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         });
     }
 
-    public watch_start() {
-
-        let message;
-
-        this._watcher = chokidar.watch(this._watcher_target, {
-            persistent: true,
-            ignoreInitial: true
-        });
-
-        if (this._view)
-            this._view.webview.postMessage({ type: 'watcher', status: 'on' });
-
-        this._watcher.on('change', path => {
-
-            let configuration = vscode.workspace.getConfiguration('elpi');
-                    
-            this._elpi                  = configuration.elpi.path;
-            this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
-
-			if(!this.findFileOnPath(this._elpi)) {
-				vscode.window
-				  .showInformationMessage(`Failed to find elpi`, 'Go to settings')
-				  .then(action => {
-					if (action == 'Go to settings')
-						vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
-				});
-				return;
-			}
-
-			if(!this.findFileOnPath(this._elpi_trace_elaborator)) {
-				vscode.window
-				  .showInformationMessage(`Failed to find elpi trace elaborator`, 'Go to settings')
-				  .then(action => {
-					if (action == 'Go to settings')
-						vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
-				});
-				return;
-			}
-
-            message = `File ${path} has been changed`;
-
-            vscode.window.showInformationMessage(message);
-
-            this._channel.appendLine(message);
-
-            this.exec("eval $(opam env) && cat " + this._watcher_target + " | " + this._elpi_trace_elaborator + " > " + this._watcher_target_elaborated);
-
-            const trace = any_parser_readTrace(JSON.parse(fs.readFileSync(this._watcher_target_elaborated, 'utf8')));
-
-            this._source = this._watcher_target;
-
-            if (this._view)
-                this._view.webview.postMessage({ type: 'trace', trace: trace, file: 'Watched' });
-        });
-
-        message = "Me watch has started. Try me by touching " + this._watcher_target;
-
-        vscode.window.showInformationMessage(message);
-
-        this._channel.appendLine(message);
-    }
-
-    public watch_stop() {
-
-        if (this._watcher != undefined
-         && this._view    != undefined) {
-
-            this._watcher.close().then(() => {
-
-                const message = "Me watch has ended.";
-
-                vscode.window.showInformationMessage(message);
-                
-                this._channel.appendLine(message);
-
-                if (this._view)
-                    this._view.webview.postMessage({ type: 'watcher', status: 'off' });
-            });
-        }
-    }
-
     public trace() {
 
         let configuration = vscode.workspace.getConfiguration('elpi');
@@ -514,14 +425,6 @@ return `<!DOCTYPE html>
                             <span class="mdi mdi-console-line"></span>
                         </a>
                         <input id="options" class="input" type="text" style="padding: 10px;" value="-test"/>
-                    </div>
-                </div>
-
-                <div class="action-buttons" style="display: flex; margin-right: 10px;">
-                    <div class="control is-grouped" style="display: flex;">
-                        <a class="button has-tooltip-arrow has-tooltip-bottom" data-tooltip="Watcher state" style="flex: 1 1 auto;">
-                            <span id="watcher_state" class="mdi mdi-eye-off"></span>
-                        </a>
                     </div>
                 </div>
 

@@ -17,9 +17,6 @@
             case 'clear':
                 clear();
                 break;
-            case 'watcher':
-                update_watcher_state(message.status);
-                break;
             case 'progress':
                 if (message.state == 'on')
                     $('#loader').addClass('is-active');
@@ -1339,21 +1336,6 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 
     function format_highlight_box(text) {
         return `<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${text}</span></span></pre>`
-    }
-
-// /////////////////////////////////////////////////////////////////////////////
-//
-// /////////////////////////////////////////////////////////////////////////////
-
-    function update_watcher_state(status) {
-
-        if(status == 'off') {
-            $("#watcher_state").removeClass("mdi-eye");
-            $("#watcher_state").addClass("mdi-eye-off");
-        } else {
-            $("#watcher_state").removeClass("mdi-eye-off");
-            $("#watcher_state").addClass("mdi-eye");
-        }
     }
 
     // /////////////////////////////////////////////////////////////////////////////
