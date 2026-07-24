@@ -1,6 +1,7 @@
+
 import * as vscode from 'vscode';
-import * as parser_v1 from './trace_v1';
-import * as parser_v2 from './trace_v2';
+import * as parser_v1 from '../shared/elaborator/trace_v1.mjs';
+import * as parser_v2 from '../shared/elaborator/trace_v2.mjs';
 import * as path from 'path';
 
 import    os = require('node:os');
