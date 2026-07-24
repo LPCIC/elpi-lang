@@ -9,17 +9,6 @@
     window.addEventListener('message', event => {
         const message = event.data; // The json data that the extension sent
         switch (message.type) {
-            case 'highlight':
-                // console.log('Got', message.html, 'for', message.indx);
-                window.inbox[message.indx].goal_text_highlighted = message.html;
-                break;
-            case 'highlight_elided':
-                    // console.log('Got', message.html, 'for', message.indx);
-                    window.inbox[message.indx].goal_text_highlighted_elided = message.html;
-                    break;
-            case 'highlight_inline':
-                $('#' + message.id).html(message.html);
-                break;
             case 'trace':
                 clear();
                 trace(message.trace);
@@ -648,7 +637,7 @@ ${step.value.findall_solution_text}
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${step.value.suspend_sibling.goal_text}</span></span></pre>
+        ${format_highlight_box(step.value.suspend_sibling.goal_text)}
     </div>
   </div>
   <div class="panel-element panel-element-footer"></div>
@@ -697,7 +686,7 @@ ${step.value.findall_solution_text}
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${step.value[i].goal_text}</span></span></pre>
+        ${format_highlight_box(step.value[i].goal_text)}
     </div>
 `;
         }
@@ -1057,7 +1046,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
 
 </div>
 <div id="${rule_id}" class="is-collapsible rule-inline">
-    <pre class="shiki" style="background-color: var(--shiki-color-background)"><span style="color: var(--shiki-color-text)">${rule_text_full}</span></pre>
+    ${format_highlight_box(rule_text_full)}
 </div>`;
         
         return fmt;
@@ -1088,7 +1077,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                        </span>
                     </div>
                     <div id="${rule_id}" class="is-collapsible rule-inline">
-                        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].value}</span></span></pre>
+                        ${format_highlight_box(element[i].value)}
                     </div>`;
         
         }
@@ -1138,7 +1127,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                           </span>
                         </div>
                         <div id="${rule_id}" class="is-collapsible rule-inline">
-                            <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].goal_text}</span></span></pre>
+                            ${format_highlight_box(element[i].goal_text)}
                         </div>`;
             } else {
 
@@ -1154,7 +1143,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${rule_loc_file} (${r
                           </span>
                         </div>
                         <div id="${rule_id}" class="is-collapsible rule-inline">
-                            <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].goal_text}</span></span></pre>
+                            ${format_highlight_box(element[i].goal_text)}
                         </div>`;
             }
 
@@ -1197,7 +1186,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
     <span>${elide(20, attempt_text)}</span>
 </div>
 <div id="${rule_id}" class="is-collapsible rule-inline">
-    <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${attempt_text}</span></span></pre>
+    ${format_highlight_box(attempt_text)}
 </div>`;
         
         return fmt;
@@ -1244,7 +1233,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element.chr_new_goals[i].goal_text}</span></span></pre>
+        ${format_highlight_box(element.chr_new_goals[i].goal_text)}
     </div>
 `;
 
@@ -1285,7 +1274,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].goal_text}</span></span></pre>
+        ${format_highlight_box(element[i].goal_text)}
     </div>
 `;
 
@@ -1333,7 +1322,7 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
       </span>
     </div>
     <div id="${rule_id}" class="is-collapsible rule-inline">
-        <pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${element[i].goal_text}</span></span></pre>
+        ${format_highlight_box(element[i].goal_text)}
     </div>
 `;
 
@@ -1346,6 +1335,10 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 `;
 
         return fmt;
+    }
+
+    function format_highlight_box(text) {
+        return `<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">${text}</span></span></pre>`
     }
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -1652,9 +1645,9 @@ class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="${attempt_loc_file} (
 
             window.inbox[i].goal_text_elided = elide(25, window.inbox[i].goal_text);
 
-            window.inbox[i].goal_text_highlighted = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text + '</span></span></pre>';
+            window.inbox[i].goal_text_highlighted = format_highlight_box(window.inbox[i].goal_text)
 
-            window.inbox[i].goal_text_highlighted_elided = '<pre class="shiki" style="background-color: var(--shiki-color-background)"><span class="line"><span style="color: var(--shiki-color-text)">' + window.inbox[i].goal_text_elided + '</span></span></pre>';
+            window.inbox[i].goal_text_highlighted_elided = format_highlight_box(window.inbox[i].goal_text_elided)
 
 // /////////////////////////////////////////////////////////////////////////////
         }

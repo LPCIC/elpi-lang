@@ -58,20 +58,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         
         this._channel.appendLine("Running extension for " + os.platform() + " - " + os.release());
 
-        let elpi_lang_grammar_path = vscode.Uri.joinPath(this._extensionUri, 'syntaxes', 'elpi.tmLanguage.json').path;
-
-        if (os.platform().toString().toLowerCase() == "win32")
-            elpi_lang_grammar_path = elpi_lang_grammar_path.slice(1);
-        
-        this._channel.appendLine("Loading grammar file " + elpi_lang_grammar_path);
-
-        const elpi_lang_grammer = JSON.parse(fs.readFileSync(elpi_lang_grammar_path, 'utf8'));
-        const elpi_lang = {
-            id: "elpi",
-            scopeName: 'source.elpi',
-            grammar: elpi_lang_grammer
-        };
-
         this._elpi = "";
         this._elpi_trace_elaborator = "";
 
@@ -116,52 +102,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.onDidReceiveMessage(message => {
             switch (message.command) {
-
-            case 'highlight':
-            {
-                const code = message.value;
-                const indx = message.index;
-                  let html = undefined;
-
-                if (this._view)
-                    this._view.webview.postMessage({
-                        type: 'highlight',
-                        html: html,
-                        indx: indx
-                    });
-
-                break;
-            }
-            case 'highlight_elided':
-            {
-                const code = message.value;
-                const indx = message.index;
-                let html = undefined;
-                                
-                if (this._view)
-                    this._view.webview.postMessage({
-                        type: 'highlight_elided',
-                        html: html,
-                        indx: indx
-                    });
-    
-                break;
-            }
-            case 'highlight_inline':
-            {
-                const code = message.value;
-                const id = message.id;
-                let html = undefined;
-                                
-                if (this._view)
-                    this._view.webview.postMessage({
-                        type: 'highlight_inline',
-                        html: html,
-                        id: id
-                    });
-    
-                break;
-            }
             case 'notify':
             {
                 vscode.window.showInformationMessage(message.value);
