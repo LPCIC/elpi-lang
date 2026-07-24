@@ -1,48 +1,19 @@
-
 import * as vscode from 'vscode';
-import * as parser_v1 from '../shared/elaborator/trace_v1.mjs';
-import * as parser_v2 from '../shared/elaborator/trace_v2.mjs';
 import * as path from 'path';
 
-import    os = require('node:os');
-import    cp = require('child_process');
-import    fs = require('fs');
-
-type TraceParser = {
-    readTrace: (x: any, context?: any) => any;
-};
-
-const traceParsers: TraceParser[] = [parser_v2, parser_v1];
-
-function any_parser_readTrace(x: any) {
-    let lastError: unknown;
-
-    for (const parser of traceParsers) {
-        try {
-            return parser.readTrace(x);
-        } catch (error) {
-            lastError = error;
-        }
-    }
-
-    if (lastError instanceof Error)
-        throw lastError;
-
-    throw new Error('Failed to parse trace with all available parser versions.');
-}
+import * as os from 'node:os';
+import * as cp from 'child_process';
+import * as fs from 'fs';
 
 export class TraceProvider implements vscode.WebviewViewProvider {
 
     public static readonly viewType = 'elpi.tracer';
 
-    private _cat: string;
     private _elpi: string;
-    private _elpi_trace_elaborator: string;
     private _options: string;
     private _options_default: string;
     private _view?: vscode.WebviewView;
     private _source: string;
-    private _target: string;
     private _target_raw: string;
     private _target_dir: string;
 
@@ -51,34 +22,27 @@ export class TraceProvider implements vscode.WebviewViewProvider {
     constructor(
         private readonly _extensionUri: vscode.Uri,
     ) {
-        
+
         this._channel.appendLine("Running extension for " + os.platform() + " - " + os.release());
 
         this._elpi = "";
-        this._elpi_trace_elaborator = "";
 
         this._options = "-test";
         this._options_default = "";
 
         this._source = "";
-        
+
         if (os.platform().toString().toLowerCase() == "win32")
             this._target_dir = process.env.APPDATA + '\\';
         else
             this._target_dir = '/tmp/';
 
-        this._target = this._target_dir + "trace.json";
         this._target_raw = this._target_dir + "trace.tmp.json";
-
-        if (os.platform().toString().toLowerCase() == "win32")
-            this._cat = "type";
-        else
-            this._cat = "cat";
     }
 
     public resolveWebviewView(
         webviewView: vscode.WebviewView,
-        context: vscode.WebviewViewResolveContext,
+        _context: vscode.WebviewViewResolveContext,
         _token: vscode.CancellationToken,
     ) {
         this._view = webviewView;
@@ -167,7 +131,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         const paths = (process.env.PATH || '')
           .split(path.delimiter)
           .map(x => path.resolve(x, name));
-        
+
         for (const p of paths) {
           if (fs.existsSync(p)) {
             return true;
@@ -199,38 +163,22 @@ export class TraceProvider implements vscode.WebviewViewProvider {
             canSelectFiles: true,
             canSelectFolders: false
         };
-       
+
         vscode.window.showOpenDialog(options).then(fileUri => {
             if (fileUri && fileUri[0]) {
-
-                let configuration = vscode.workspace.getConfiguration('elpi');
-        
-                this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
-
-				if(!this.findFileOnPath(this._elpi_trace_elaborator)) {
-					vscode.window
-					  .showInformationMessage(`Failed to find elpi trace elaborator`, 'Go to settings')
-					  .then(action => {
-						if (action == 'Go to settings')
-							vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
-					});
-					return;
-				}
 
                 this._channel.appendLine("Opening raw trace: " + fileUri[0].fsPath);
 
                 if (this._view)
                     this._view.webview.postMessage({ type: 'progress', state: 'on' });
 
-                this.exec(this._cat + " " + fileUri[0].fsPath + " | " + this._elpi_trace_elaborator + " > " + this._target);
-
-                const trace = any_parser_readTrace(JSON.parse(fs.readFileSync(this._target, 'utf8')));
+                const input = fs.readFileSync(fileUri[0].fsPath, 'utf-8');
 
                 this._source = fileUri[0].fsPath;
 
                 if (this._view)
-                    this._view.webview.postMessage({ type: 'trace', trace: trace, file: fileUri[0].fsPath });
-                
+                    this._view.webview.postMessage({ type: 'trace', source: input, file: fileUri[0].fsPath });
+
                 if (this._view)
                     this._view.webview.postMessage({ type: 'progress', state: 'off' });
             }
@@ -241,7 +189,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         const options: vscode.SaveDialogOptions = {
             saveLabel: 'Save raw trace as'
         };
-       
+
         vscode.window.showSaveDialog(options).then(fileUri => {
             if (fileUri) {
                 this._channel.appendLine("Saving trace as: " + fileUri.toString() + " from " + this._source);
@@ -250,7 +198,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
                     if (err) {
                         this._channel.appendLine("Error saving raw trace to " + fileUri.toString().slice(7) + " " + err.toString());
                     } else {
-                        this._channel.appendLine("Raw trace saved to " + fileUri.toString().slice(7)); 
+                        this._channel.appendLine("Raw trace saved to " + fileUri.toString().slice(7));
                     }
                 });
             }
@@ -261,29 +209,18 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         let configuration = vscode.workspace.getConfiguration('elpi');
         let current_file = '';
-        
+
         this._elpi                  = configuration.elpi.path;
-        this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
 
-		if(!this.findFileOnPath(this._elpi)) {
-			vscode.window
-			  .showInformationMessage(`Failed to find elpi`, 'Go to settings')
-			  .then(action => {
-				if (action == 'Go to settings')
-					vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
-			});
-			return;
-		}
-
-		if(!this.findFileOnPath(this._elpi_trace_elaborator)) {
-			vscode.window
-			  .showInformationMessage(`Failed to find elpi trace elaborator`, 'Go to settings')
-			  .then(action => {
-			    if (action == 'Go to settings')
-					vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
-		    });
-			return;
-		}
+        if(!this.findFileOnPath(this._elpi)) {
+          vscode.window
+            .showInformationMessage(`Failed to find elpi`, 'Go to settings')
+            .then(action => {
+            if (action == 'Go to settings')
+              vscode.commands.executeCommand('workbench.action.openSettings', '@ext:gares.elpi-lang');
+          });
+          return;
+        }
 
         this._options_default = configuration.elpi.options;
 
@@ -292,7 +229,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         current_file = vscode.window.activeTextEditor.document.fileName;
         vscode.window.showInformationMessage(`Tracing: ${current_file}`);
-        
+
         this._channel.appendLine("Trace started: " + current_file);
 
         // --
@@ -302,20 +239,6 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         // this.exec("eval $(opam env) && " + this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
         this.exec(this._elpi + " " + this._options + " " + this._options_default.replace('[OUTPUT]', this._target_raw) + " " + current_file);
-            
-        // cp.execSync(this._elpi + " " + this._options + " " + this._options_default + " " + current_file);
-        
-        this.exec(this._cat + " " + this._target_raw + " | " + this._elpi_trace_elaborator + " > " + this._target);
-        
-        // --
-
-        if(!fs.existsSync(this._target)) {
-            vscode.window.showInformationMessage(`Trace generation failed`);
-            this._channel.appendLine("Trace generation failed.");
-            return;
-        } else {
-            this._channel.appendLine("Trace generation successful.");
-        }
 
         // --
 
@@ -323,12 +246,13 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
         // --
 
-        const trace = any_parser_readTrace(JSON.parse(fs.readFileSync(this._target, 'utf8')))
+        const input = fs.readFileSync(this._target_raw, 'utf-8');
+
 
         // --- Send message to the view backend
 
         if (this._view)
-            this._view.webview.postMessage({ type: 'trace', trace: trace, file: current_file });
+            this._view.webview.postMessage({ type: 'trace', source: input, file: current_file });
     }
 
     private _getHtmlForWebview(webview: vscode.Webview) {
@@ -339,6 +263,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         const     bulmaQVUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', 'bulma-quickview', 'dist', 'js', 'bulma-quickview.min.js'));
         const     bulmaACUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'node_modules', '@creativebulma', 'bulma-collapsible', 'dist', 'js', 'bulma-collapsible.min.js'));
         const      scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
+        const      sharedUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'out', 'shared'));
 
         const    styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
         const   styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
@@ -537,7 +462,7 @@ return `<!DOCTYPE html>
                            </span>
                            <span class="tag is-info goal_id"></span>
                        </div>
-                       
+
                        <br/>
                        <br/>
                        <br/>
@@ -550,8 +475,8 @@ return `<!DOCTYPE html>
                    </div>
                 </div>
 
-				<br/>
-				<br/>
+        <br/>
+        <br/>
             </div>
         </div>
 
@@ -563,7 +488,7 @@ return `<!DOCTYPE html>
 
             <div class="quickview-body">
                 <div class="quickview-block" id="snippet">
-                
+
                 </div>
             </div>
         </div>
@@ -581,7 +506,10 @@ return `<!DOCTYPE html>
         <script src="${fuzzUri}"></script>
         <script src="${bulmaQVUri}"></script>
         <script src="${bulmaACUri}"></script>
-        <script src="${scriptUri}"></script>
+        <script type="importmap">
+            { "imports": { "shared/": "${sharedUri}/" } }
+        </script>
+        <script type="module" src="${scriptUri}"></script>
     </body>
 </html>`;
     }
