@@ -35,7 +35,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         this._source = "";
 
         if (os.platform().toString().toLowerCase() == "win32")
-            this._target_dir = process.env.APPDATA + '\\';
+            this._target_dir = process.env['APPDATA'] + '\\';
         else
             this._target_dir = '/tmp/';
 
@@ -130,7 +130,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
     private findFileOnPath(name: string) {
         if (name.startsWith('/')) { return true };
 
-        const paths = (process.env.PATH || '')
+        const paths = (process.env['PATH'] || '')
           .split(path.delimiter)
           .map(x => path.resolve(x, name));
 
@@ -212,7 +212,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         let configuration = vscode.workspace.getConfiguration('elpi');
         let current_file = '';
 
-        this._elpi                  = configuration.elpi.path;
+        this._elpi                  = configuration['elpi'].path;
 
         if(!this.findFileOnPath(this._elpi)) {
           vscode.window
@@ -224,7 +224,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
           return;
         }
 
-        this._options_default = configuration.elpi.options;
+        this._options_default = configuration['elpi'].options;
 
         if(vscode.window.activeTextEditor == undefined)
             return;

@@ -309,8 +309,8 @@ export function materialize(
 
   // TODO: why is it okay only if there's exactly one old broken step?
   if (broken.length !== 0) {
-    if (broken.length > 1 || broken[0].step < maxStepIdx) {
-      const { step, time } = broken[0];
+    if (broken.length > 1 || broken[0]!.step < maxStepIdx) {
+      const { step, time } = broken[0]!;
       throw new CardError(
         `Input trace is broken since step_id ${step}, json object ${time}`
       )
@@ -357,7 +357,7 @@ export function materialize(
       if (successful.more.length === 0) {
         return 'YellowRed';
       } else {
-        const last = successful.more[successful.more.length - 1];
+        const last = successful.more.at(-1);
         const lastCard = preCards.find(c => c.stepId.runtime === rid && c.stepId.step === last)
         if (!lastCard) {
           throw new CardError(`Last successful sibling [${rid}, ${last}] does not have a card`);

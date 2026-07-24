@@ -103,10 +103,14 @@ export function chrEventChains(
 }
 
 export function decodeAttempt(l: TimedItem): { loc: Location, code: string } {
-  const [loc, code] = l.item.payload;
+  const p = l.item.payload;
+  if (p.length !== 2) {
+    throw new DecodeError('Expected a location and a string', p.toString());
+  }
+  const [loc, code] = p;
   return {
-    loc: parseLoc(loc),
-    code
+    loc: parseLoc(loc!),
+    code: code!
   }
 }
 
@@ -115,13 +119,13 @@ export function decodeInferEvent(l: TimedItem): Event {
   if (l.item.name === 'user:assign:resume' && p.length === 1) {
     return {
       kind: 'ResumeGoal',
-      goals: p[0].split(' ').map(g => Number.parseInt(g))
+      goals: p[0]!.split(' ').map(g => Number.parseInt(g))
     }
   }
   if (l.item.name === 'user:backchain:fail-to' && p.length === 1) {
     return {
       kind: 'Fail',
-      failedGoal: p[0]
+      failedGoal: p[0]!
     }
   }
   return {
@@ -148,7 +152,10 @@ export function decodeCHRTryList(
   l.forEach(({ head: attempt, tail: events }) => {
     const { loc, code } = decodeAttempt(attempt);
     const start = attempt.time;
-    const stop = events[events.length - 1].time;
+    if (events.length === 0) {
+      throw new DecodeError('Expected at least one event in a CHR attempt', '');
+    }
+    const stop = events.at(-1)!.time;
 
     const assigned: Event[] = [];
     const resumed: GoalId[] = [];
@@ -189,9 +196,10 @@ export function decodeString(input: TimedItem): string {
 }
 
 export function decodeInt(input: TimedItem): number {
-  // TODO: better errors?
-  const [s] = input.item.payload;
-  return Number.parseInt(s);
+  if (input.item.payload.length !== 1) {
+    throw new DecodeError('Expected singleton', input.item.payload.toString())
+  }
+  return Number.parseInt(input.item.payload[0]!);
 }
 
 const ctxRegex = /File "\(context step_id:(?<step>\d+)\)"/;
@@ -201,7 +209,7 @@ function parseLoc(input: string): Location {
   if (matches) {
     return {
       kind: 'Context',
-      step: Number.parseInt(matches.groups!['step'])
+      step: Number.parseInt(matches.groups!['step']!)
     }
   }
   matches = fileRegex.exec(input);
@@ -210,10 +218,10 @@ function parseLoc(input: string): Location {
     return {
       kind: 'File',
       file: {
-        filename: groups['name'],
-        line: Number.parseInt(groups['line']),
-        column: Number.parseInt(groups['col']),
-        character: Number.parseInt(groups['beg'])
+        filename: groups['name']!,
+        line: Number.parseInt(groups['line']!),
+        column: Number.parseInt(groups['col']!),
+        character: Number.parseInt(groups['beg']!)
       }
     };
   }
@@ -221,19 +229,27 @@ function parseLoc(input: string): Location {
 }
 
 export function decodeCut(input: TimedItem): Cut {
+  const p = input.item.payload;
+  if (p.length !== 3) {
+    throw new DecodeError('Expected a goal, location and text', p.toString());
+  }
   const [g, r, t] = input.item.payload;
   return {
-    goalId: Number.parseInt(g),
-    loc: parseLoc(r),
-    clause: t
+    goalId: Number.parseInt(g!),
+    loc: parseLoc(r!),
+    clause: t!
   };
 }
 
 export function decodeChrStoreEntry(item: TimedItem): Constraint {
-  const [gid, gtext] = item.item.payload;
+  const payload = item.item.payload;
+  if (payload.length !== 2) {
+    throw new DecodeError('Expected a number and a string', payload.toString())
+  }
+  const [gid, gtext] = payload;
   return {
-    id: Number.parseInt(gid),
-    text: gtext
+    id: Number.parseInt(gid!),
+    text: gtext!
   }
 }
 
@@ -287,7 +303,10 @@ export function decodeStep(l: TimedItem[]): DecodedStep {
     }
   }
 
-  const x = l[0];
+  if (l.length === 0) {
+    throw new DecodeError('Empty step encountered', '')
+  }
+  const x = l[0]!;
   return {
     kind: 'Broken',
     step: x.item.step,

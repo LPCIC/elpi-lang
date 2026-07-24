@@ -135,13 +135,20 @@ function elaborateStep(
   if (!items.every(i => i.item.runtime_id === rid)) {
     throw new ElaborationError('Found step with multiple runtime IDs', step);
   }
+  const unGoal = (payload: string[]) => {
+    if (payload.length !== 2) {
+      throw new ElaborationError('Expected a predicate and goal', step);
+    }
+    return { pred: payload[0]!, goal: payload[1]! };
+  }
   const decoded = D.decodeStep(items);
   switch (decoded.kind) {
     case 'Init':
     case 'Broken':
       return decoded;
     case 'Findall': {
-      const { goal_id: goalId, payload: [_pred, goal] } = decoded.origin.item;
+      const { goal_id: goalId, payload } = decoded.origin.item;
+      const { goal } = unGoal(payload);
       const result = D.all('user:assign', asm => ({
         payload: D.decodeString(asm), time: asm.time
       }), items);
@@ -167,11 +174,12 @@ function elaborateStep(
         kind: 'Findall',
         goal, goalId,
         result: result.map(a => a.payload),
-        timestamp: { start: decoded.start, stop: result[0].time }
+        timestamp: { start: decoded.start, stop: result[0]!.time }
       }
     }
     case 'Suspend': {
-      const { goal_id: goalId, payload: [_pred, goal] } = decoded.value.item;
+      const { goal_id: goalId, payload } = decoded.value.item;
+      const { goal } = unGoal(payload)
       const siblings = D.all('user:subgoal', D.decodeInt, items);
       if (siblings.length !== 1) {
         throw new ElaborationError(`Suspension expects one subgoal, found ${siblings.length}`, step);
@@ -192,11 +200,12 @@ function elaborateStep(
       )
       return {
         kind: 'Suspend',
-        goal, goalId, sibling: siblings[0]
+        goal, goalId, sibling: siblings[0]!
       }
     }
     case 'Cut': {
-      const { goal_id: goalId, payload: [_pred, _goal] } = decoded.value.item;
+      const { goal_id: goalId, payload } = decoded.value.item;
+      const {} = unGoal(payload)
       const cut = D.all('user:rule:cut:branch', D.decodeCut, items);
       pushFrame(
         stepId,
@@ -250,12 +259,13 @@ function elaborateStep(
       }
     }
     case 'Focus': {
-      const { item: { goal_id: goalId, payload: [pred, goal] }, time } = decoded.value;
+      const { item: { goal_id: goalId, payload }, time } = decoded.value;
+      const { pred, goal } = unGoal(payload);
       const rule = D.has('user:rule', items);
       if (!rule || rule.item.payload.length !== 1) {
         throw new ElaborationError('Malformed execution step', step)
       }
-      const [name] = rule.item.payload;
+      const name = rule.item.payload[0]!;
       const siblings = D.all('user:subgoal', D.decodeInt, items);
 
       let outcome: Outcome;
@@ -280,14 +290,15 @@ function elaborateStep(
           const trylist = D.inferChains('user:rule:backchain:try', items)
                             .map(c => D.decodeInferAttempt(c));
           if (trylist.length !== 0) {
+            const { loc, code } = trylist[0]!;
             pushFrame(
               stepId,
               goalId,
               {
                 kind: 'UserRule',
                 value: {
-                  ruleLoc: trylist[0].loc,
-                  ruleText: trylist[0].code
+                  ruleLoc: loc,
+                  ruleText: code
                 }
               },
               siblings,
@@ -331,7 +342,7 @@ function elaborateStep(
           action = {
             kind: 'Builtin',
             name, outcome,
-            events: events[0].tail.map(e => D.decodeInferEvent(e))
+            events: events[0]!.tail.map(e => D.decodeInferEvent(e))
           }
           break;
         }
@@ -386,8 +397,8 @@ function elaborateStep(
           action = {
             kind: 'Builtin',
             name: ruleName,
-            events: (events.length > 0)
-              ? events[0].tail.map(e => D.decodeInferEvent(e))
+            events: (events.length !== 0)
+              ? events[0]!.tail.map(e => D.decodeInferEvent(e))
               : [],
             outcome
           }
