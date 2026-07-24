@@ -27,9 +27,7 @@
 	"activationEvents": [
 		"onView:elpi.tracer",
 		"onCommand:elpi.trace",
-		"onCommand:elpi.clear",
-		"onCommand:elpi.watch_start",
-		"onCommand:elpi.watch_stop"
+		"onCommand:elpi.clear"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -51,18 +49,6 @@
 				"category": "Elpi Tracer",
 				"title": "Trace",
 				"icon": "$(debug-console)"
-			},
-			{
-				"command": "elpi.watch_start",
-				"category": "Elpi Tracer",
-				"title": "Start watching",
-				"icon": "$(debug-alt)"
-			},
-			{
-				"command": "elpi.watch_stop",
-				"category": "Elpi Tracer",
-				"title": "Stop watching",
-				"icon": "$(stop)"
 			},
 			{
 				"command": "elpi.clear",
@@ -132,16 +118,6 @@
 					"command": "elpi.clear",
 					"group": "navigation@3",
 					"when": "view == elpi.tracer"
-				},
-				{
-					"command": "elpi.watch_start",
-					"group": "navigation@4",
-					"when": "view == elpi.tracer"
-				},
-				{
-					"command": "elpi.watch_stop",
-					"group": "navigation@5",
-					"when": "view == elpi.tracer"
 				}
 			]
 		},
@@ -183,7 +159,6 @@
 		"@typescript-eslint/eslint-plugin": "^5.19.0",
 		"@typescript-eslint/parser": "^5.19.0",
 		"@vscode/vsce": "^2.19.0",
-		"child-process": "^1.0.2",
 		"eslint": "^8.13.0",
 		"mustache": "^4.0.1",
 		"typescript": "^4.6.3"
@@ -196,7 +171,6 @@
 		"bulma-pageloader": "^0.3.0",
 		"bulma-quickview": "^2.0.0",
 		"bulma-tooltip": "^3.0.2",
-		"chokidar": "^3.5.3",
 		"fuzzball": "^2.1.2",
 		"jquery": "^3.6.1",
 		"vue": "^2.7.0"
