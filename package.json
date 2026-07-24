@@ -15,7 +15,7 @@
 	],
 	"license": "MIT",
 	"engines": {
-		"vscode": "^1.50.0"
+		"vscode": "^1.101.0"
 	},
 	"extensionKind": [
 		"ui",
@@ -29,7 +29,7 @@
 		"onCommand:elpi.trace",
 		"onCommand:elpi.clear"
 	],
-	"main": "./out/extension.js",
+	"main": "./out/extension/extension.js",
 	"contributes": {
 		"commands": [
 			{
@@ -148,20 +148,20 @@
 	"scripts": {
 		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json",
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
+		"compile": "tsc -b ./src/extension",
 		"lint": "eslint . --ext .ts,.tsx",
-		"watch": "tsc -w -p ./",
+		"watch": "tsc -b -w ./src/extension",
 		"deploy": "vsce publish"
 	},
 	"devDependencies": {
-		"@types/node": "^17.0.35",
-		"@types/vscode": "^1.50.0",
+		"@types/node": "^22",
+		"@types/vscode": "~1.101",
 		"@typescript-eslint/eslint-plugin": "^5.19.0",
 		"@typescript-eslint/parser": "^5.19.0",
 		"@vscode/vsce": "^2.19.0",
 		"eslint": "^8.13.0",
 		"mustache": "^4.0.1",
-		"typescript": "^4.6.3"
+		"typescript": "^5.3"
 	},
 	"dependencies": {
 		"@creativebulma/bulma-collapsible": "^1.0.4",

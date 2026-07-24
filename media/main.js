@@ -1,5 +1,6 @@
 // This script will be run within the webview itself
 // It cannot access the main VS Code APIs directly.
+import * as E from 'shared/elaborator/index.mjs';
 (function () {
     const vscode = acquireVsCodeApi();
 
@@ -9,8 +10,16 @@
         switch (message.type) {
             case 'trace':
                 clear();
-                trace(message.trace);
-                $("#trace-information").val(message.file + ' on ' + new Date().toISOString());
+                try {
+                    trace(E.elaborate(message.source))
+                    $("#trace-information").val(message.file + ' on ' + new Date().toISOString());
+                } catch (e) {
+                    console.error('Error while elaborating trace', e)
+                    vscode.postMessage({
+                      command: 'notify',
+                      value: `The trace file appears to be broken: ${e}`
+                    })
+                }
                 break;
             case 'clear':
                 clear();
