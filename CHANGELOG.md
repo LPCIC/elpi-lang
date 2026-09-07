@@ -1,5 +1,9 @@
 # Change Log
 
+### 0.4.0
+
+- syntax for Elpi 4.0
+- visual improvements
 
 ### 0.3.2
 
