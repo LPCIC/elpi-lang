@@ -21,6 +21,9 @@
 			"include": "#kind-declaration"
 		},
 		{
+			"include": "#data-declaration"
+		},
+		{
 			"include": "#pred-declaration"
 		},
 		{
@@ -179,7 +182,7 @@
 		},
 		"pred-declaration": {
 			"name": "pred.declaration",
-			"begin": "((external)?\\s*(pred|func|symbol))\\s+({{{ident}}}|{{{infix}}})\\s*:?",
+			"begin": "((external|builtin)?\\s*(pred|func|symbol|symb))\\s+({{{ident}}}|{{{infix}}})\\s*:?",
 			"end": "(?<=\\.\\s)",
 			"beginCaptures": {
 				"1": {
@@ -242,7 +245,7 @@
 		},
 		"kind-declaration": {
 			"name": "kind.declaration",
-			"begin": "^(\\s*(external)?\\s*kind)\\s+(?'rec'({{{ident}}}|{{{infix}}})(,\\s(\\g'rec'))?)\\s+([^\\.]+)",
+			"begin": "^(\\s*(external|builtin)?\\s*kind)\\s+(?'rec'({{{ident}}}|{{{infix}}})(,\\s(\\g'rec'))?)\\s+([^\\.]+)",
 			"end": "(\\.)\\s",
 			"beginCaptures": {
 				"1": {
@@ -269,9 +272,39 @@
 				}
 			]
 		},
+		"data-declaration": {
+			"name": "data.declaration",
+			"begin": "^(\\s*(external|builtin)?\\s*data)\\s+({{{ident}}}|{{{infix}}})",
+			"end": "(\\.)\\s",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				},
+				"2": {
+					"name": "keyword.control.elpi"
+				},
+				"3": {
+					"name": "entity.name.type"
+				}
+			},
+			"endCaptures": {
+				"1": {
+					"name": "keyword.control.elpi"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#comments"
+				},
+				{
+					"match": "{{{wbl}}}{{{var}}}",
+					"name": "entity.name.type"
+				}
+			]
+		},
 		"type-declaration": {
 			"name": "type.declaration",
-			"begin": "^(\\s*(external)?\\s*type)\\s+(?'rec'({{{ident}}}|{{{infix}}})(,\\s(\\g'rec'))?)",
+			"begin": "^(\\s*(external|builtin)?\\s*type)\\s+(?'rec'({{{ident}}}|{{{infix}}})(,\\s(\\g'rec'))?)",
 			"end": "(?<=\\.\\s)",
 			"beginCaptures": {
 				"1": {
