@@ -28,6 +28,7 @@ jobs:
       - run: npm install -g vsce
       - run: npm install
       - run: npm run build
+      - run: npm run test
       - run: vsce package
 
       - name: Save Artifact

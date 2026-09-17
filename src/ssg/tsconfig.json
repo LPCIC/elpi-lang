@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "module": "node18",
+    "rootDir": "../",
+    "outDir": "../../out",
+    "resolveJsonModule": true
+  },
+  "include": [".", "config.json"],
+  "references": [
+    { "path": "../shared" },
+    { "path": "../client" }
+  ]
+}

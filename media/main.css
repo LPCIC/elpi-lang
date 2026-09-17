@@ -4,7 +4,7 @@ html, body
   font-size: 14px;
   line-height: 1.5;
   height: 100%;
-  background-color: transparent;
+  /* background-color: transparent; */
 }
 
 .aside
@@ -92,6 +92,8 @@ html, body
   width: 100%;
   margin-bottom: 10px;
   border: 1px solid var(--vscode-panel-border); /* Decrease opacity later on */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 190px;
 }
 
 .inbox-messages .card-indented,
@@ -460,6 +462,9 @@ hr
 {
   margin-top: 10px;
   margin-left: 10px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
 }
 
 .navbar.is-fixed-bottom p

@@ -7,6 +7,10 @@
 // - 'readFoo': convert a JSON-compatible value into a TypeScript value
 //   of type 'Foo'.
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+/* tslint:disable */
+/* eslint-disable */
 
 export type Item = {
   kind: Kind[];

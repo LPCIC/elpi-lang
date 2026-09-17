@@ -1,0 +1,5 @@
+{
+  "baseUrl": "/elpi-trace-explorer",
+  "distDir": "./dist",
+  "mediaDir": "./media"
+}
