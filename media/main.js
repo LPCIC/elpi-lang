@@ -1,5 +1,6 @@
 // This script will be run within the webview itself
 // It cannot access the main VS Code APIs directly.
+import * as E from 'shared/elaborator/index.mjs';
 (function () {
     const vscode = acquireVsCodeApi();
 
@@ -9,8 +10,16 @@
         switch (message.type) {
             case 'trace':
                 clear();
-                trace(message.trace);
-                $("#trace-information").val(message.file + ' on ' + new Date().toISOString());
+                try {
+                    trace(E.elaborate(message.source))
+                    $("#trace-information").val(message.file + ' on ' + new Date().toISOString());
+                } catch (e) {
+                    console.error('Error while elaborating trace', e)
+                    vscode.postMessage({
+                      command: 'notify',
+                      value: `The trace file appears to be broken: ${e}`
+                    })
+                }
                 break;
             case 'clear':
                 clear();
@@ -580,9 +589,16 @@ ${step.value.findall_solution_text}
             contents += `
 <article class="panel">
     <div class="panel-heading">
-        Cut branch for <span onclick="inboxVue.jump(${ds});" class="has-tooltip-arrow has-tooltip-bottom" data-tooltip="Goal ID: ${step.value.cut_victims[i].cut_branch_for_goal.goal_id} - (${window.inbox[ds].rt}, ${window.inbox[ds].id})`;
-	    contents += '\n\n' + step.value.cut_victims[i].cut_branch_for_goal.goal_text.replace(/['"]+/g, '');
-	    contents += `">
+        Cut branch for <span
+          class="has-tooltip-arrow has-tooltip-bottom"
+          ${typeof ds !== 'undefined' ? `onclick="inboxVue.jump(${ds});"` : ''}
+          data-tooltip="Goal ID: ${step.value.cut_victims[i].cut_branch_for_goal.goal_id} - ${
+            typeof ds !== 'undefined'
+              ? `(${window.inbox[ds].rt}, ${window.inbox[ds].id})`
+              : '(never resumed)'
+          }`;
+            contents += '\n\n' + step.value.cut_victims[i].cut_branch_for_goal.goal_text.replace(/['"]+/g, '');
+            contents += `">
           ${elide(20, step.value.cut_victims[i].cut_branch_for_goal.goal_text)}
         </span>
     </div>
@@ -972,15 +988,15 @@ ${step.value.findall_solution_text}
             rule_text_full = rule_text
         }
 
-        if (rule_type == "BuiltinRule")
-            if (element.value.name) {// v2
-                rule_text = element.value.kind.kind + ' - ' + element.value.name + ': ' + element.value.payload.join('\n');
-                rule_text_full = element.value.payload.join('\n');
+        if (rule_type == "BuiltinRule") {
+            rule_text = element.value.kind.kind + ' - ' + element.value.name;
+            if (element.value.payload.length !== 0) {// v2
+                rule_text_full = element.value.payload.join('\n')
+                rule_text += ': ' + rule_text_full;
             } else { //v1
-                rule_text = element.value.kind + ' - ' + element.value.value;
                 rule_text_full = rule_text
             }
-        // rule_text = rule_text.trim();
+        }
 
         let fmt = `
 <div class="panel-element">
