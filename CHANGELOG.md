@@ -1,5 +1,9 @@
 # Change Log
 
+### Unreleased
+
+- Client for the `elpi-lsp` language server: diagnostics, hover, go to definition
+
 ### 0.4.0
 
 - syntax for Elpi 4.0

@@ -15,7 +15,7 @@
 	],
 	"license": "MIT",
 	"engines": {
-		"vscode": "^1.50.0"
+		"vscode": "^1.82.0"
 	},
 	"extensionKind": [
 		"ui",
@@ -25,6 +25,7 @@
 		"Programming Languages"
 	],
 	"activationEvents": [
+		"onLanguage:elpi",
 		"onView:elpi.tracer",
 		"onCommand:elpi.trace",
 		"onCommand:elpi.clear"
@@ -55,6 +56,16 @@
 				"category": "Elpi Tracer",
 				"title": "Clear",
 				"icon": "$(debug-console-clear-all)"
+			},
+			{
+				"command": "elpi-lsp.restart",
+				"category": "Elpi LSP",
+				"title": "Restart server"
+			},
+			{
+				"command": "elpi-lsp.showOutput",
+				"category": "Elpi LSP",
+				"title": "Show output"
 			}
 		],
 		"configuration": {
@@ -74,6 +85,30 @@
 					"type": "string",
 					"default": "elpi-trace-elaborator",
 					"markdownDescription": "Path to `elpi-trace-elaborator` (or elpi from `$PATH`)"
+				},
+				"elpi-lsp.path": {
+					"type": "string",
+					"default": "elpi-lsp",
+					"markdownDescription": "Path to the `elpi-lsp` language server (or `elpi-lsp` from `$PATH`). A leading `~/` is expanded."
+				},
+				"elpi-lsp.args": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [],
+					"markdownDescription": "Extra command line arguments passed to the language server."
+				},
+				"elpi-lsp.debug": {
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "off",
+					"scope": "window",
+					"markdownDescription": "Trace the LSP messages exchanged with the server (shown in the *Elpi LSP Trace* output channel)."
 				}
 			}
 		},
@@ -155,7 +190,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^17.0.35",
-		"@types/vscode": "^1.50.0",
+		"@types/vscode": "^1.82.0",
 		"@typescript-eslint/eslint-plugin": "^5.19.0",
 		"@typescript-eslint/parser": "^5.19.0",
 		"@vscode/vsce": "^2.19.0",
@@ -173,6 +208,7 @@
 		"bulma-tooltip": "^3.0.2",
 		"fuzzball": "^2.1.2",
 		"jquery": "^3.6.1",
-		"vue": "^2.7.0"
+		"vue": "^2.7.0",
+		"vscode-languageclient": "^9.0.1"
 	}
 }
