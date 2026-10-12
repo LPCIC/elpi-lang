@@ -15,7 +15,7 @@
 	],
 	"license": "MIT",
 	"engines": {
-		"vscode": "^1.50.0"
+		"vscode": "^1.88.0"
 	},
 	"extensionKind": [
 		"ui",
@@ -25,11 +25,13 @@
 		"Programming Languages"
 	],
 	"activationEvents": [
+		"onLanguage:elpi",
 		"onView:elpi.tracer",
 		"onCommand:elpi.trace",
 		"onCommand:elpi.clear"
 	],
-	"main": "./out/extension.js",
+	"main": "./dist/node/extension.js",
+	"browser": "./dist/web/extension.js",
 	"contributes": {
 		"commands": [
 			{
@@ -55,6 +57,16 @@
 				"category": "Elpi Tracer",
 				"title": "Clear",
 				"icon": "$(debug-console-clear-all)"
+			},
+			{
+				"command": "elpi-lsp.restart",
+				"category": "Elpi LSP",
+				"title": "Restart server"
+			},
+			{
+				"command": "elpi-lsp.showOutput",
+				"category": "Elpi LSP",
+				"title": "Show output"
 			}
 		],
 		"configuration": {
@@ -65,15 +77,40 @@
 					"default": "-trace-on json [OUTPUT] -trace-at run 0 999 -trace-only user",
 					"markdownDescription": "Command line arguments"
 				},
-				"elpi.elpi.path": {
+				"elpi.bin": {
 					"type": "string",
-					"default": "elpi",
-					"markdownDescription": "Path to `elpi` binary (or elpi from `$PATH`)"
+					"default": "",
+					"markdownDescription": "Directory that contains the Elpi executables: `elpi` (the tracer), `elpi-trace-elaborator` (the tracer) and `elpi-lsp` (the language server). When empty, they are looked up in the `$PATH`. A leading `~/` is expanded."
 				},
-				"elpi.elpi_trace_elaborator.path": {
+				"elpi-lsp.args": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [],
+					"markdownDescription": "Extra command line arguments passed to the language server."
+				},
+				"elpi-lsp.useBundled": {
+					"type": "boolean",
+					"default": false,
+					"markdownDescription": "Use the language server bundled with the extension (`elpi-lsp` compiled to WebAssembly) even when the executable `elpi-lsp` is installed. The bundled server is used anyway when the executable is not found; it is slower."
+				},
+				"elpi-lsp.maxErrors": {
+					"type": "number",
+					"default": 100,
+					"minimum": 1,
+					"markdownDescription": "Maximum number of errors reported for a file: the checking of the file stops after it. Passed to the server as `--max-errors`."
+				},
+				"elpi-lsp.debug": {
 					"type": "string",
-					"default": "elpi-trace-elaborator",
-					"markdownDescription": "Path to `elpi-trace-elaborator` (or elpi from `$PATH`)"
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "off",
+					"scope": "window",
+					"markdownDescription": "Trace the LSP messages exchanged with the server (shown in the *Elpi LSP Trace* output channel)."
 				}
 			}
 		},
@@ -82,6 +119,11 @@
 				"language": "elpi",
 				"scopeName": "source.elpi",
 				"path": "./syntaxes/elpi.tmLanguage.json"
+			},
+			{
+				"language": "elpi-hover",
+				"scopeName": "source.elpi.hover",
+				"path": "./syntaxes/elpi-hover.tmLanguage.json"
 			}
 		],
 		"languages": [
@@ -95,6 +137,13 @@
 					".elpi"
 				],
 				"configuration": "./elpi-configuration.json"
+			},
+			{
+				"id": "elpi-hover",
+				"aliases": [
+					"Elpi hover",
+					"elpi-hover"
+				]
 			}
 		],
 		"menus": {
@@ -138,6 +187,48 @@
 					"icon": "media/panel.svg"
 				}
 			]
+		},
+		"semanticTokenScopes": [
+			{
+				"language": "elpi",
+				"scopes": {
+					"function": [
+						"entity.name.function"
+					],
+					"enumMember": [
+						"constant.other.enum"
+					],
+					"parameter": [
+						"variable.parameter"
+					],
+					"variable": [
+						"variable.language.elpi"
+					],
+					"keyword": [
+						"keyword.control.elpi"
+					],
+					"number": [
+						"constant.numeric"
+					],
+					"string": [
+						"string.quoted.double"
+					],
+					"type": [
+						"entity.name.type"
+					],
+					"typeParameter": [
+						"entity.name.type.parameter"
+					],
+					"macro": [
+						"entity.name.function.macro"
+					]
+				}
+			}
+		],
+		"configurationDefaults": {
+			"[elpi]": {
+				"editor.semanticHighlighting.enabled": true
+			}
 		}
 	},
 	"__metadata": {
@@ -147,18 +238,28 @@
 	},
 	"scripts": {
 		"build": "mustache elpiLexicalConventions.js syntaxes/elpi.tmLanguage.mustache > syntaxes/elpi.tmLanguage.json",
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
+		"vscode:prepublish": "npm run compile && npm run compile-web && npm run server-web",
+		"compile": "tsc -p ./ && npm run bundle",
+		"bundle": "esbuild src/extension.ts src/bundled_server.ts --bundle --platform=node --format=cjs --external:vscode --sourcemap --outdir=dist/node",
+		"compile-web": "tsc -p tsconfig.web.json && esbuild src/web/extension.ts --bundle --platform=browser --format=cjs --external:vscode --sourcemap --outfile=dist/web/extension.js",
+		"server-web": "node scripts/server-web.js",
+		"test-desktop": "npm run compile && npm run server-web && node out/test/desktop/runTests.js",
+		"compile-web-test": "esbuild src/web/test/index.ts --bundle --platform=browser --format=cjs --external:vscode --outfile=dist/web/test/index.js",
+		"test-web": "npm run compile-web && npm run server-web && npm run compile-web-test && vscode-test-web --browserType=chromium --headless --extensionDevelopmentPath=. --extensionTestsPath=dist/web/test/index.js test-fixtures/web",
 		"lint": "eslint . --ext .ts,.tsx",
-		"watch": "tsc -w -p ./",
+		"watch": "npm run bundle -- --watch=forever & tsc -w -p ./",
 		"deploy": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/node": "^17.0.35",
-		"@types/vscode": "^1.50.0",
+		"@types/vscode": "^1.82.0",
 		"@typescript-eslint/eslint-plugin": "^5.19.0",
 		"@typescript-eslint/parser": "^5.19.0",
+		"@vscode/test-electron": "^3.1.0",
+		"@vscode/test-web": "^0.0.81",
 		"@vscode/vsce": "^2.19.0",
+		"elpi-webrunner": "latest",
+		"esbuild": "^0.28.2",
 		"eslint": "^8.13.0",
 		"mustache": "^4.0.1",
 		"typescript": "^4.6.3"
@@ -173,6 +274,7 @@
 		"bulma-tooltip": "^3.0.2",
 		"fuzzball": "^2.1.2",
 		"jquery": "^3.6.1",
+		"vscode-languageclient": "^9.0.1",
 		"vue": "^2.7.0"
 	}
 }

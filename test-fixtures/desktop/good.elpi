@@ -1,0 +1,4 @@
+pred double i:int, o:int.
+double X Y :- Y is X * 2.
+pred main.
+main :- double 3 Y, std.map [Y] (x\ y\ y = x) L, print L.

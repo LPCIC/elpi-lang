@@ -1,0 +1,13 @@
+{
+	// the extension for the browser (src/web), type checked only: it is
+	// bundled by esbuild (npm run compile-web)
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"lib": ["es2020", "webworker"],
+		"types": [],
+		"skipLibCheck": true,
+		"noEmit": true
+	},
+	"include": ["src/web"],
+	"exclude": []
+}

@@ -1,4 +1,36 @@
 .vscode/**
 .vscode-test/**
+.vscode-test-web/**
 .gitignore
 vsc-extension-quickstart.md
+*.vsix
+**/*.map
+
+# the code is bundled (dist/node, dist/web): the sources, the output of tsc
+# (for the tests) and the build files are not needed
+src/**
+out/**
+dist/web/test/**
+test-fixtures/**
+scripts/**
+tsconfig*.json
+syntaxes/*.mustache
+elpiLexicalConventions.js
+
+# node_modules: only the files that the webview of the tracer loads (see
+# provider.ts); the font of @mdi in the only format that it needs (woff2)
+node_modules/**
+!node_modules/jquery/dist/jquery.min.js
+!node_modules/vue/dist/vue.min.js
+!node_modules/fuzzball/dist/fuzzball.umd.min.js
+!node_modules/bulma-quickview/dist/js/bulma-quickview.min.js
+!node_modules/bulma-quickview/dist/css/bulma-quickview.min.css
+!node_modules/@creativebulma/bulma-collapsible/dist/js/bulma-collapsible.min.js
+!node_modules/@creativebulma/bulma-collapsible/dist/css/bulma-collapsible.min.css
+!node_modules/bulma/css/bulma.min.css
+!node_modules/bulma-divider/dist/css/bulma-divider.min.css
+!node_modules/bulma-tooltip/dist/css/bulma-tooltip.min.css
+!node_modules/bulma-pageloader/dist/css/bulma-pageloader.min.css
+!node_modules/@mdi/font/css/materialdesignicons.min.css
+!node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff2
+.github/**

@@ -1,0 +1,77 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Elpi hover",
+	"scopeName": "source.elpi.hover",
+	"comment": "What the language server shows on hover: 'term : type' or a type. The term is Elpi code, the type uses the syntax of the declarations (pred A, B -> C).",
+	"patterns": [
+		{
+			"include": "#term-and-type"
+		},
+		{
+			"include": "#type"
+		}
+	],
+	"repository": {
+		"term-and-type": {
+			"match": "^(.*?)(\\s:\\s)(.*)$",
+			"captures": {
+				"1": {
+					"patterns": [
+						{
+							"include": "#term"
+						}
+					]
+				},
+				"2": {
+					"name": "keyword.control.elpi"
+				},
+				"3": {
+					"patterns": [
+						{
+							"include": "#type"
+						}
+					]
+				}
+			}
+		},
+		"term": {
+			"patterns": [
+				{
+					"include": "source.elpi#strings"
+				},
+				{
+					"include": "source.elpi#numbers"
+				},
+				{
+					"include": "source.elpi#variables"
+				},
+				{
+					"include": "source.elpi#keywords"
+				},
+				{
+					"include": "source.elpi#binders"
+				},
+				{
+					"match": "^\\s*[a-z][A-Za-z0-9+*/^<>`'?@#~=&!\\-$_.]*",
+					"name": "entity.name.function"
+				}
+			]
+		},
+		"type": {
+			"patterns": [
+				{
+					"match": "\\b(pred|func|type)\\b|->|[,()]|\\.\\.",
+					"name": "keyword.control.elpi"
+				},
+				{
+					"match": "\\b[io]:",
+					"name": "entity.name.tag"
+				},
+				{
+					"match": "[A-Za-z_][A-Za-z0-9+*/^<>`'?@#~=&!\\-$_.]*",
+					"name": "entity.name.type"
+				}
+			]
+		}
+	}
+}
