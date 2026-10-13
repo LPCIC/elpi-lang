@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as parser_v1 from './trace_v1';
 import * as parser_v2 from './trace_v2';
 import * as path from 'path';
+import { binary, exists } from './binaries';
 
 import    os = require('node:os');
 import    cp = require('child_process');
@@ -161,19 +162,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
     }
 
     private findFileOnPath(name: string) {
-        if (name.startsWith('/')) { return true };
-
-        const paths = (process.env.PATH || '')
-          .split(path.delimiter)
-          .map(x => path.resolve(x, name));
-        
-        for (const p of paths) {
-          if (fs.existsSync(p)) {
-            return true;
-          }
-        }
-        return false;
-      }
+        return exists(name);
+    }
 
     private exec(command: string) {
 
@@ -204,7 +194,7 @@ export class TraceProvider implements vscode.WebviewViewProvider {
 
                 let configuration = vscode.workspace.getConfiguration('elpi');
         
-                this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
+                this._elpi_trace_elaborator = binary('elpi-trace-elaborator');
 
 				if(!this.findFileOnPath(this._elpi_trace_elaborator)) {
 					vscode.window
@@ -261,8 +251,8 @@ export class TraceProvider implements vscode.WebviewViewProvider {
         let configuration = vscode.workspace.getConfiguration('elpi');
         let current_file = '';
         
-        this._elpi                  = configuration.elpi.path;
-        this._elpi_trace_elaborator = configuration.elpi_trace_elaborator.path;
+        this._elpi                  = binary('elpi');
+        this._elpi_trace_elaborator = binary('elpi-trace-elaborator');
 
 		if(!this.findFileOnPath(this._elpi)) {
 			vscode.window

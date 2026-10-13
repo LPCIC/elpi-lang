@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import * as provider from './provider';
+import * as lsp from './lsp';
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
 	const tracer = new provider.TraceProvider(context.extensionUri);
 
@@ -29,4 +30,10 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('elpi.clear', () => {
 			tracer.clear();
 		}));
+
+	await lsp.activate(context);
+}
+
+export function deactivate() {
+	return lsp.deactivate();
 }
