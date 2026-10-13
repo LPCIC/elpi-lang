@@ -3,6 +3,7 @@
 ### Unreleased
 
 - Client for the `elpi-lsp` language server: diagnostics, hover, go to definition
+- Setting `elpi-lsp.maxErrors` (default 100): the maximum number of errors reported for a file
 
 ### 0.4.0
 

@@ -35,12 +35,13 @@ This extension provides support for the [Elpi](https://github.com/LPCIC/elpi) pr
 - `elpi-lsp.path`: path to the `elpi-lsp` executable (default: `elpi-lsp` in
   the `PATH`; a leading `~/` is expanded)
 - `elpi-lsp.args`: extra command line arguments for the server
+- `elpi-lsp.maxErrors`: maximum number of errors reported for a file (default 100)
 - `elpi-lsp.debug`: `off`, `messages` or `verbose`, traces the LSP
   messages in the *Elpi LSP Trace* output channel
 
 Commands (command palette): *Elpi LSP: Restart server*, *Elpi LSP: Show output*.
-After changing `elpi-lsp.path` or `elpi-lsp.args` the extension offers to
-restart the server.
+After changing `elpi-lsp.path`, `elpi-lsp.args` or `elpi-lsp.maxErrors` the
+extension offers to restart the server.
 
 ## Known Issues
 

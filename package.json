@@ -99,6 +99,12 @@
 					"default": [],
 					"markdownDescription": "Extra command line arguments passed to the language server."
 				},
+				"elpi-lsp.maxErrors": {
+					"type": "number",
+					"default": 100,
+					"minimum": 1,
+					"markdownDescription": "Maximum number of errors reported for a file: the checking of the file stops after it. Passed to the server as `--max-errors`."
+				},
 				"elpi-lsp.debug": {
 					"type": "string",
 					"enum": [

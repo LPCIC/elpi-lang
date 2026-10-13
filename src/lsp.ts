@@ -18,7 +18,7 @@ function expandHome(p: string): string {
 function serverOptions(): ServerOptions {
 	const config = vscode.workspace.getConfiguration('elpi-lsp');
 	const command = expandHome(config.get<string>('path') || 'elpi-lsp');
-	const args = config.get<string[]>('args') || [];
+	const args = (config.get<string[]>('args') || []).concat(['--max-errors', String(config.get<number>('maxErrors') || 100)]);
 	const executable = { command, args, transport: TransportKind.stdio };
 	return { run: executable, debug: executable };
 }
@@ -90,7 +90,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('elpi-lsp.showOutput', () => outputChannel.show(true)),
 		vscode.workspace.onDidChangeConfiguration(async e => {
 			if (e.affectsConfiguration('elpi-lsp.debug')) { await applyDebug(); }
-			if (e.affectsConfiguration('elpi-lsp.path') || e.affectsConfiguration('elpi-lsp.args')) {
+			if (e.affectsConfiguration('elpi-lsp.path') || e.affectsConfiguration('elpi-lsp.args') || e.affectsConfiguration('elpi-lsp.maxErrors')) {
 				const choice = await vscode.window.showInformationMessage('Elpi LSP: server settings changed.', 'Restart server');
 				if (choice === 'Restart server') { await restart(); }
 			}
