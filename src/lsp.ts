@@ -1,6 +1,5 @@
-import * as os from 'os';
-import * as path from 'path';
 import * as vscode from 'vscode';
+import { binary } from './binaries';
 import { LanguageClient, LanguageClientOptions, ServerOptions, Trace, TransportKind } from 'vscode-languageclient/node';
 
 // Client of the `elpi-lsp` language server (diagnostics, hover, go to definition)
@@ -9,15 +8,9 @@ let client: LanguageClient | undefined = undefined;
 let outputChannel: vscode.OutputChannel;
 let traceChannel: vscode.OutputChannel;
 
-function expandHome(p: string): string {
-	if (p === '~') { return os.homedir(); }
-	if (p.startsWith('~/')) { return path.join(os.homedir(), p.slice(2)); }
-	return p;
-}
-
 function serverOptions(): ServerOptions {
 	const config = vscode.workspace.getConfiguration('elpi-lsp');
-	const command = expandHome(config.get<string>('path') || 'elpi-lsp');
+	const command = binary('elpi-lsp');
 	const args = (config.get<string[]>('args') || []).concat(['--max-errors', String(config.get<number>('maxErrors') || 100)]);
 	const executable = { command, args, transport: TransportKind.stdio };
 	return { run: executable, debug: executable };
@@ -44,11 +37,11 @@ async function startClient() {
 		await applyDebug();
 		outputChannel.appendLine('[elpi-lsp] server started');
 	} catch (e) {
-		const msg = `Elpi LSP: cannot start server "${command}": ${e instanceof Error ? e.message : e}. Check the setting elpi-lsp.path.`;
+		const msg = `Elpi LSP: cannot start server "${command}": ${e instanceof Error ? e.message : e}. Check the setting elpi.bin.`;
 		outputChannel.appendLine('[elpi-lsp] ' + msg);
 		const choice = await vscode.window.showErrorMessage(msg, 'Open settings', 'Show output');
 		if (choice === 'Open settings') {
-			vscode.commands.executeCommand('workbench.action.openSettings', 'elpi-lsp');
+			vscode.commands.executeCommand('workbench.action.openSettings', 'elpi.bin');
 		} else if (choice === 'Show output') {
 			outputChannel.show(true);
 		}
@@ -90,7 +83,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('elpi-lsp.showOutput', () => outputChannel.show(true)),
 		vscode.workspace.onDidChangeConfiguration(async e => {
 			if (e.affectsConfiguration('elpi-lsp.debug')) { await applyDebug(); }
-			if (e.affectsConfiguration('elpi-lsp.path') || e.affectsConfiguration('elpi-lsp.args') || e.affectsConfiguration('elpi-lsp.maxErrors')) {
+			if (e.affectsConfiguration('elpi.bin') || e.affectsConfiguration('elpi-lsp.args') || e.affectsConfiguration('elpi-lsp.maxErrors')) {
 				const choice = await vscode.window.showInformationMessage('Elpi LSP: server settings changed.', 'Restart server');
 				if (choice === 'Restart server') { await restart(); }
 			}

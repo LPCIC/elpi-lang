@@ -3,6 +3,13 @@
 ### Unreleased
 
 - Client for the `elpi-lsp` language server: diagnostics, hover, go to definition
+- New language `elpi-hover`, with its grammar, to colour the popup of the language server
+  (`term : type`)
+- Syntax: the name after `pred`, `func`, ... is a function name only in a declaration, not
+  in a type inside parentheses, like `(func list int)` in a hover popup
+- Setting `elpi.bin`: the directory that contains the Elpi executables (`elpi`,
+  `elpi-lsp`, `elpi-trace-elaborator`), replaces the three settings
+  `elpi.elpi.path`, `elpi.elpi_trace_elaborator.path` and `elpi-lsp.path`
 - Setting `elpi-lsp.maxErrors` (default 100): the maximum number of errors reported for a file
 
 ### 0.4.0

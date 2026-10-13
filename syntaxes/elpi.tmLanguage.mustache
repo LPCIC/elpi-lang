@@ -182,7 +182,7 @@
 		},
 		"pred-declaration": {
 			"name": "pred.declaration",
-			"begin": "((external|builtin)?\\s*(pred|func|symbol|symb))\\s+({{{ident}}}|{{{infix}}})\\s*:?",
+			"begin": "(?<!\\()(?<!\\(\\s)((external|builtin)?\\s*(pred|func|symbol|symb))\\s+({{{ident}}}|{{{infix}}})\\s*:?",
 			"end": "(?<=\\.\\s)",
 			"beginCaptures": {
 				"1": {

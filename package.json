@@ -76,20 +76,10 @@
 					"default": "-trace-on json [OUTPUT] -trace-at run 0 999 -trace-only user",
 					"markdownDescription": "Command line arguments"
 				},
-				"elpi.elpi.path": {
+				"elpi.bin": {
 					"type": "string",
-					"default": "elpi",
-					"markdownDescription": "Path to `elpi` binary (or elpi from `$PATH`)"
-				},
-				"elpi.elpi_trace_elaborator.path": {
-					"type": "string",
-					"default": "elpi-trace-elaborator",
-					"markdownDescription": "Path to `elpi-trace-elaborator` (or elpi from `$PATH`)"
-				},
-				"elpi-lsp.path": {
-					"type": "string",
-					"default": "elpi-lsp",
-					"markdownDescription": "Path to the `elpi-lsp` language server (or `elpi-lsp` from `$PATH`). A leading `~/` is expanded."
+					"default": "",
+					"markdownDescription": "Directory that contains the Elpi executables: `elpi` (the tracer), `elpi-trace-elaborator` (the tracer) and `elpi-lsp` (the language server). When empty, they are looked up in the `$PATH`. A leading `~/` is expanded."
 				},
 				"elpi-lsp.args": {
 					"type": "array",
@@ -123,6 +113,11 @@
 				"language": "elpi",
 				"scopeName": "source.elpi",
 				"path": "./syntaxes/elpi.tmLanguage.json"
+			},
+			{
+				"language": "elpi-hover",
+				"scopeName": "source.elpi.hover",
+				"path": "./syntaxes/elpi-hover.tmLanguage.json"
 			}
 		],
 		"languages": [
@@ -136,6 +131,13 @@
 					".elpi"
 				],
 				"configuration": "./elpi-configuration.json"
+			},
+			{
+				"id": "elpi-hover",
+				"aliases": [
+					"Elpi hover",
+					"elpi-hover"
+				]
 			}
 		],
 		"menus": {
