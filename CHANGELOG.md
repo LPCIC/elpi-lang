@@ -3,6 +3,8 @@
 ### Unreleased
 
 - Client for the `elpi-lsp` language server: diagnostics, hover, go to definition
+- Semantic highlighting from the language server (constants, bound variables, variables of the
+  rules, types), on by default for Elpi files (`editor.semanticHighlighting.enabled`)
 - New language `elpi-hover`, with its grammar, to colour the popup of the language server
   (`term : type`)
 - Syntax: the name after `pred`, `func`, ... is a function name only in a declaration, not

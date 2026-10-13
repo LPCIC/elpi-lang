@@ -181,6 +181,45 @@
 					"icon": "media/panel.svg"
 				}
 			]
+		},
+		"semanticTokenScopes": [
+			{
+				"language": "elpi",
+				"scopes": {
+					"function": [
+						"entity.name.function"
+					],
+					"enumMember": [
+						"constant.other.enum"
+					],
+					"parameter": [
+						"variable.parameter"
+					],
+					"variable": [
+						"variable.language.elpi"
+					],
+					"keyword": [
+						"keyword.control.elpi"
+					],
+					"number": [
+						"constant.numeric"
+					],
+					"string": [
+						"string.quoted.double"
+					],
+					"type": [
+						"entity.name.type"
+					],
+					"typeParameter": [
+						"entity.name.type.parameter"
+					]
+				}
+			}
+		],
+		"configurationDefaults": {
+			"[elpi]": {
+				"editor.semanticHighlighting.enabled": true
+			}
 		}
 	},
 	"__metadata": {

@@ -8,8 +8,10 @@ This extension provides support for the [Elpi](https://github.com/LPCIC/elpi) pr
 
 - Basic syntax highlighting
 - Trace visualisation and navigation
-- Diagnostics (all syntax errors, type errors, warnings), hover (types) and
-  go to definition, provided by the `elpi-lsp` language server
+- Diagnostics (all syntax errors, type errors, warnings), hover (types),
+  go to definition, highlight of the binder of a variable and semantic colors
+  (bound variables, variables of the rules and constants have different colors),
+  provided by the `elpi-lsp` language server
 
 ## Requirements
 
