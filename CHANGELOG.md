@@ -1,6 +1,6 @@
 # Change Log
 
-### Unreleased
+### 0.5.0
 
 - Client for the `elpi-lsp` language server: diagnostics, hover, go to definition
 - Semantic highlighting from the language server (constants, bound variables, variables of the
